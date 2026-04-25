@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>GAME ZONE ONLINE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+<style>
+:root{
+  --bg:#0a0a18;
+  --bg2:#15152e;
+  --neon:#00f0ff;
+  --neon2:#ff00e5;
+  --neon3:#a200ff;
+  --green:#00ff88;
+  --yellow:#ffd400;
+  --red:#ff3060;
+  --text:#e6f1ff;
+  --muted:#7a86b8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Rajdhani',sans-serif;color:var(--text);overflow-x:hidden}
+body{
+  background:
+    radial-gradient(ellipse at 20% 10%, rgba(162,0,255,.25), transparent 50%),
+    radial-gradient(ellipse at 80% 90%, rgba(0,240,255,.22), transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(255,0,229,.10), transparent 60%),
+    linear-gradient(180deg,#05050f 0%,#0a0a1f 100%);
+  min-height:100vh;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(0,240,255,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,240,255,.05) 1px,transparent 1px);
+  background-size:40px 40px;
+  mask-image:radial-gradient(ellipse at center,#000 30%,transparent 80%);
+}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+
+/* === Заголовки === */
+h1.title{
+  font-family:'Orbitron',sans-serif;font-weight:900;
+  font-size:clamp(2rem,6vw,4.5rem);
+  text-align:center;letter-spacing:.1em;
+  background:linear-gradient(90deg,var(--neon),var(--neon2),var(--neon3),var(--neon));
+  background-size:300% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 5s linear infinite;
+  text-shadow:0 0 40px rgba(0,240,255,.3);
+  margin:1rem 0;
+}
+@keyframes shine{to{background-position:300% 0}}
+h2{font-family:'Orbitron',sans-serif;font-weight:700;letter-spacing:.05em;margin-bottom:1rem}
+
+/* === Кнопки === */
+.btn{
+  font-family:'Orbitron',sans-serif;font-weight:700;
+  padding:.9rem 1.8rem;border:none;border-radius:12px;cursor:pointer;
+  letter-spacing:.1em;text-transform:uppercase;font-size:.95rem;
+  background:linear-gradient(135deg,var(--neon3),var(--neon2));
+  color:white;position:relative;overflow:hidden;
+  box-shadow:0 0 20px rgba(162,0,255,.5),inset 0 0 20px rgba(255,0,229,.2);
+  transition:transform .15s,box-shadow .2s;
+}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 0 35px rgba(162,0,255,.8)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.4;cursor:not-allowed;filter:grayscale(.6)}
+.btn.cyan{background:linear-gradient(135deg,#0066ff,var(--neon));box-shadow:0 0 20px rgba(0,240,255,.5)}
+.btn.cyan:hover:not(:disabled){box-shadow:0 0 35px rgba(0,240,255,.8)}
+.btn.green{background:linear-gradient(135deg,#00aa55,var(--green));box-shadow:0 0 20px rgba(0,255,136,.5)}
+.btn.red{background:linear-gradient(135deg,#aa0033,var(--red));box-shadow:0 0 20px rgba(255,48,96,.5)}
+.btn.ghost{background:transparent;border:2px solid var(--neon);box-shadow:0 0 15px rgba(0,240,255,.3) inset}
+.btn.small{padding:.5rem 1rem;font-size:.8rem}
+
+input,textarea{
+  font-family:'Rajdhani',sans-serif;font-size:1.1rem;
+  background:rgba(10,10,30,.7);border:2px solid rgba(0,240,255,.3);
+  color:var(--text);padding:.8rem 1rem;border-radius:10px;outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+input:focus{border-color:var(--neon);box-shadow:0 0 15px rgba(0,240,255,.4)}
+
+/* === Карточки === */
+.card{
+  background:linear-gradient(135deg,rgba(20,20,50,.7),rgba(30,15,60,.7));
+  backdrop-filter:blur(12px);
+  border:1px solid rgba(0,240,255,.2);
+  border-radius:18px;padding:1.5rem;
+  box-shadow:0 8px 40px rgba(0,0,0,.5),inset 0 0 30px rgba(0,240,255,.05);
+}
+
+/* === Экраны === */
+.screen{display:none;flex-direction:column;align-items:center;justify-content:center;
+  flex:1;padding:1rem;width:100%;max-width:1100px;margin:0 auto;animation:fadeIn .4s}
+.screen.active{display:flex}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* === Главное меню === */
+#menu .menu-buttons{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;margin-top:2rem}
+#menu .btn-big{padding:1.5rem 2.5rem;font-size:1.2rem;min-width:240px}
+.nick-input{width:100%;max-width:380px;text-align:center;font-size:1.3rem;letter-spacing:.1em}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.8rem;margin-top:1.5rem;width:100%;max-width:700px}
+.stat-card{padding:.8rem;text-align:center;background:rgba(0,0,30,.4);border-radius:10px;border:1px solid rgba(0,240,255,.15)}
+.stat-card .game-name{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.stat-card .nums{font-family:'Orbitron',sans-serif;font-weight:700;margin-top:.3rem}
+.stat-card .nums span{margin:0 .3rem}
+.stat-card .w{color:var(--green)}.stat-card .l{color:var(--red)}.stat-card .d{color:var(--yellow)}
+
+/* === Ожидание === */
+.room-code{
+  font-family:'Orbitron',sans-serif;font-weight:900;
+  font-size:clamp(2.5rem,8vw,5rem);
+  letter-spacing:.3em;text-align:center;
+  color:var(--neon);text-shadow:0 0 30px var(--neon);
+  padding:1.5rem 2.5rem;
+  background:rgba(0,0,30,.6);border:2px solid rgba(0,240,255,.4);
+  border-radius:20px;margin:1.5rem 0;
+}
+.pulse{
+  width:80px;height:80px;border-radius:50%;
+  background:radial-gradient(circle,var(--neon) 0%,transparent 70%);
+  animation:pulse 1.5s ease-out infinite;margin:1rem auto;
+}
+@keyframes pulse{
+  0%{transform:scale(.5);opacity:1}
+  100%{transform:scale(1.6);opacity:0}
+}
+.spinner{
+  width:60px;height:60px;border:4px solid rgba(0,240,255,.2);
+  border-top-color:var(--neon);border-radius:50%;
+  animation:spin 1s linear infinite;margin:1.5rem auto;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* === Лобби === */
+.lobby-players{display:flex;gap:1.5rem;align-items:center;justify-content:center;margin:1rem 0;flex-wrap:wrap}
+.player-pill{padding:.8rem 1.5rem;border-radius:50px;background:rgba(0,0,30,.5);border:2px solid var(--neon3);font-weight:700}
+.player-pill.host{border-color:var(--neon2)}
+.player-pill.guest{border-color:var(--neon)}
+.vs{font-family:'Orbitron',sans-serif;font-size:1.5rem;color:var(--neon2)}
+.connection-status{color:var(--green);font-weight:700;text-align:center;margin:.5rem 0}
+
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1.5rem 0;width:100%;max-width:900px}
+.game-card{
+  cursor:pointer;padding:1.5rem 1rem;border-radius:14px;text-align:center;
+  background:linear-gradient(135deg,rgba(30,30,80,.6),rgba(50,20,100,.6));
+  border:2px solid rgba(162,0,255,.3);transition:all .2s;
+}
+.game-card:hover{transform:translateY(-3px);border-color:var(--neon2);box-shadow:0 0 25px rgba(255,0,229,.4)}
+.game-card.selected{border-color:var(--neon);box-shadow:0 0 30px var(--neon);background:linear-gradient(135deg,rgba(0,80,120,.7),rgba(0,40,80,.7))}
+.game-card.locked{cursor:default;opacity:.7}
+.game-card .icon{font-size:2.8rem;margin-bottom:.3rem}
+.game-card .name{font-family:'Orbitron',sans-serif;font-weight:700;font-size:.95rem}
+
+/* === Игровой экран === */
+.game-header{
+  width:100%;max-width:1000px;display:flex;justify-content:space-between;align-items:center;
+  padding:.8rem 1.2rem;background:rgba(10,10,30,.7);border-radius:14px;
+  border:1px solid rgba(0,240,255,.2);margin-bottom:1rem;flex-wrap:wrap;gap:.5rem
+}
+.player-info{display:flex;align-items:center;gap:.5rem;font-weight:700}
+.player-info .score{font-family:'Orbitron',sans-serif;font-size:1.4rem;color:var(--neon)}
+.turn-indicator{font-family:'Orbitron',sans-serif;font-weight:700;padding:.5rem 1rem;border-radius:50px;text-transform:uppercase;letter-spacing:.05em;font-size:.85rem}
+.turn-indicator.my{background:rgba(0,255,136,.2);color:var(--green);border:1px solid var(--green);box-shadow:0 0 15px rgba(0,255,136,.4)}
+.turn-indicator.opp{background:rgba(255,48,96,.15);color:var(--red);border:1px solid var(--red)}
+
+.game-area{
+  width:100%;max-width:1000px;min-height:400px;
+  display:flex;justify-content:center;align-items:center;
+  padding:1rem;
+}
+
+.game-controls{display:flex;gap:.8rem;margin-top:1rem;flex-wrap:wrap;justify-content:center}
+
+/* === Чат === */
+.chat-box{
+  width:100%;max-width:1000px;margin-top:1rem;padding:.8rem;
+  background:rgba(10,10,30,.7);border-radius:12px;border:1px solid rgba(0,240,255,.15)
+}
+.chat-messages{min-height:60px;max-height:90px;overflow-y:auto;font-size:.9rem;margin-bottom:.5rem}
+.chat-msg{margin:.15rem 0;padding:.15rem 0}
+.chat-msg .author{color:var(--neon);font-weight:700}
+.chat-msg .time{color:var(--muted);font-size:.75rem;margin-left:.4rem}
+.chat-input-row{display:flex;gap:.5rem;align-items:center}
+.chat-input-row input{flex:1;padding:.5rem .8rem;font-size:.95rem}
+.emoji-row{display:flex;gap:.3rem}
+.emoji-btn{background:rgba(0,0,30,.5);border:1px solid rgba(0,240,255,.2);
+  border-radius:8px;font-size:1.2rem;cursor:pointer;padding:.3rem .5rem;transition:all .15s}
+.emoji-btn:hover{transform:scale(1.2);background:rgba(0,240,255,.15)}
+
+/* === Индикатор соединения === */
+.conn-indicator{
+  position:fixed;top:1rem;right:1rem;z-index:100;
+  display:flex;align-items:center;gap:.5rem;padding:.4rem .8rem;
+  background:rgba(10,10,30,.85);border-radius:50px;border:1px solid rgba(0,240,255,.2);
+  font-family:'Orbitron',sans-serif;font-size:.8rem;backdrop-filter:blur(10px)
+}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--muted);box-shadow:0 0 10px currentColor}
+.dot.green{background:var(--green);color:var(--green)}
+.dot.yellow{background:var(--yellow);color:var(--yellow)}
+.dot.red{background:var(--red);color:var(--red)}
+
+.sound-btn{
+  position:fixed;top:1rem;left:1rem;z-index:100;
+  width:42px;height:42px;border-radius:50%;border:1px solid rgba(0,240,255,.3);
+  background:rgba(10,10,30,.85);cursor:pointer;font-size:1.2rem;color:var(--text);
+  backdrop-filter:blur(10px);transition:all .2s
+}
+.sound-btn:hover{border-color:var(--neon);box-shadow:0 0 15px rgba(0,240,255,.5)}
+
+/* === Победа === */
+.win-screen{text-align:center}
+.win-title{
+  font-family:'Orbitron',sans-serif;font-weight:900;
+  font-size:clamp(2rem,7vw,4rem);
+  background:linear-gradient(90deg,var(--yellow),var(--neon2),var(--yellow));
+  background-size:200% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shine 3s linear infinite;margin:1rem 0;
+}
+.confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:50}
+
+/* === Крестики-нолики === */
+.ttt-board{display:grid;grid-template-columns:repeat(3,100px);grid-template-rows:repeat(3,100px);gap:8px;background:rgba(0,240,255,.1);padding:8px;border-radius:14px}
+.ttt-cell{
+  background:rgba(10,10,30,.6);border-radius:10px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',sans-serif;font-size:3.5rem;font-weight:900;
+  transition:background .15s;border:1px solid rgba(0,240,255,.15)
+}
+.ttt-cell:hover:not(.filled):not(.locked){background:rgba(0,240,255,.15)}
+.ttt-cell.x{color:var(--neon);text-shadow:0 0 20px var(--neon);animation:pop .3s}
+.ttt-cell.o{color:var(--neon2);text-shadow:0 0 20px var(--neon2);animation:pop .3s}
+.ttt-cell.win{background:rgba(255,212,0,.3);box-shadow:0 0 30px var(--yellow)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* === Connect 4 === */
+.c4-board{
+  background:linear-gradient(135deg,#1a1a4a,#2a1a6a);
+  padding:12px;border-radius:14px;
+  display:grid;grid-template-columns:repeat(7,52px);gap:6px;
+  box-shadow:inset 0 0 20px rgba(0,0,0,.5)
+}
+.c4-cell{
+  width:52px;height:52px;border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#0a0a20,#02020a);
+  cursor:pointer;transition:transform .1s;position:relative;overflow:hidden
+}
+.c4-cell.r{background:radial-gradient(circle at 30% 30%,#ff6080,#a00030);box-shadow:0 0 15px rgba(255,48,96,.6) inset,0 0 10px rgba(255,48,96,.4);animation:drop .4s}
+.c4-cell.y{background:radial-gradient(circle at 30% 30%,#ffe060,#aa8800);box-shadow:0 0 15px rgba(255,212,0,.6) inset,0 0 10px rgba(255,212,0,.4);animation:drop .4s}
+.c4-cell.win{animation:winPulse 1s infinite}
+@keyframes drop{from{transform:translateY(-300px)}to{transform:translateY(0)}}
+@keyframes winPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5);box-shadow:0 0 25px white inset,0 0 20px white}}
+
+/* === Pong === */
+.pong-canvas{background:#02020a;border:2px solid var(--neon);border-radius:10px;
+  box-shadow:0 0 40px rgba(0,240,255,.4),inset 0 0 30px rgba(0,240,255,.1);max-width:100%}
+
+/* === Морской бой === */
+.bs-container{display:flex;gap:2rem;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.bs-side{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.bs-side h3{font-family:'Orbitron',sans-serif;font-size:1rem;color:var(--neon)}
+.bs-board{display:grid;grid-template-columns:repeat(10,28px);grid-template-rows:repeat(10,28px);gap:2px;background:rgba(0,240,255,.15);padding:4px;border-radius:8px}
+.bs-cell{background:rgba(0,30,60,.6);border-radius:3px;cursor:pointer;transition:background .1s;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+.bs-cell.ship{background:rgba(0,240,255,.4)}
+.bs-cell.ship.placing{background:rgba(0,255,136,.5)}
+.bs-cell.invalid{background:rgba(255,48,96,.5)}
+.bs-cell.hit{background:radial-gradient(circle,#ff6060,#a00000);animation:explode .5s}
+.bs-cell.miss{background:rgba(50,80,120,.6);color:white}
+.bs-cell.miss::after{content:"•";color:var(--muted);font-size:1.2rem}
+.bs-cell.sunk{background:radial-gradient(circle,#ff2060,#600010);box-shadow:0 0 12px var(--red)}
+.bs-cell.enemy{background:rgba(20,20,40,.6)}
+.bs-cell.enemy:hover{background:rgba(0,240,255,.25)}
+@keyframes explode{0%{transform:scale(.5)}50%{transform:scale(1.3)}100%{transform:scale(1)}}
+.bs-ships-bank{display:flex;flex-direction:column;gap:.4rem;padding:.8rem;background:rgba(0,0,30,.5);border-radius:10px;border:1px solid rgba(0,240,255,.15)}
+.bs-ship-item{display:flex;gap:.4rem;align-items:center;cursor:pointer;padding:.3rem;border-radius:6px}
+.bs-ship-item:hover{background:rgba(0,240,255,.1)}
+.bs-ship-item.selected{background:rgba(0,240,255,.25);box-shadow:0 0 10px rgba(0,240,255,.4)}
+.bs-ship-item.placed{opacity:.4}
+.bs-ship-item .seg{width:18px;height:18px;background:var(--neon);border-radius:3px}
+
+/* === RPS === */
+.rps-arena{display:flex;justify-content:space-around;align-items:center;width:100%;max-width:700px;min-height:280px}
+.rps-side{display:flex;flex-direction:column;align-items:center;gap:.5rem}
+.rps-display{
+  font-size:7rem;width:160px;height:160px;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle,rgba(0,240,255,.15),transparent);
+  border:2px solid rgba(0,240,255,.3);border-radius:50%;
+}
+.rps-display.shake{animation:shake 1s}
+.rps-display.win{box-shadow:0 0 40px var(--green);border-color:var(--green)}
+.rps-display.lose{box-shadow:0 0 40px var(--red);border-color:var(--red)}
+@keyframes shake{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-15px) rotate(-10deg)}50%{transform:translateY(0) rotate(0)}75%{transform:translateY(-15px) rotate(10deg)}}
+.rps-vs{font-family:'Orbitron',sans-serif;font-size:2rem;color:var(--neon2)}
+.rps-buttons{display:flex;gap:1rem;margin-top:1rem;justify-content:center}
+.rps-btn{
+  font-size:3rem;width:90px;height:90px;border-radius:50%;cursor:pointer;
+  background:rgba(10,10,30,.7);border:2px solid rgba(0,240,255,.4);
+  transition:all .15s
+}
+.rps-btn:hover:not(:disabled){transform:scale(1.1);box-shadow:0 0 25px var(--neon);border-color:var(--neon)}
+.rps-btn.chosen{background:rgba(0,240,255,.3);border-color:var(--neon);box-shadow:0 0 20px var(--neon)}
+.rps-btn:disabled{opacity:.4;cursor:not-allowed}
+.rps-countdown{font-family:'Orbitron',sans-serif;font-size:4rem;color:var(--yellow);text-shadow:0 0 30px var(--yellow);text-align:center;animation:pop .3s}
+
+/* === Утилиты === */
+.flex-col{display:flex;flex-direction:column;gap:1rem;align-items:center}
+.row{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;justify-content:center}
+.muted{color:var(--muted)}
+.center{text-align:center}
+.hide{display:none !important}
+.toast{
+  position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);
+  background:rgba(10,10,30,.9);padding:.8rem 1.5rem;border-radius:50px;
+  border:1px solid var(--neon);z-index:200;backdrop-filter:blur(10px);
+  animation:fadeIn .3s
+}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(5px)}
+.modal.active{display:flex}
+.modal-content{background:linear-gradient(135deg,rgba(20,20,50,.95),rgba(40,15,70,.95));padding:2rem;border-radius:18px;border:1px solid var(--neon);max-width:400px;text-align:center}
+
+@media(max-width:600px){
+  .ttt-board{grid-template-columns:repeat(3,80px);grid-template-rows:repeat(3,80px)}
+  .ttt-cell{font-size:2.8rem}
+  .c4-board{grid-template-columns:repeat(7,40px)}
+  .c4-cell{width:40px;height:40px}
+  .bs-board{grid-template-columns:repeat(10,24px);grid-template-rows:repeat(10,24px)}
+  .bs-cell{font-size:.7rem}
+  .rps-display{width:120px;height:120px;font-size:5rem}
+}
+</style>
+</head>
+<body>
+<button class="sound-btn" id="soundBtn" title="Звук">🔊</button>
+<div class="conn-indicator" id="connIndicator" style="display:none">
+  <span class="dot" id="connDot"></span>
+  <span id="connText">--ms</span>
+</div>
+
+<div class="app">
+
+<!-- ЭКРАН 1: МЕНЮ -->
+<div class="screen active" id="menu">
+  <h1 class="title">GAME ZONE ONLINE</h1>
+  <p class="muted center">Играй с другом по интернету. Никаких серверов — чистый P2P.</p>
+  <div class="card flex-col" style="margin-top:2rem;width:100%;max-width:520px">
+    <label class="muted">Твой никнейм</label>
+    <input class="nick-input" id="nickInput" maxlength="16" placeholder="Введи имя...">
+    <div class="menu-buttons">
+      <button class="btn btn-big" id="createRoomBtn">🟣 Создать комнату</button>
+      <button class="btn cyan btn-big" id="joinRoomBtn">🔵 Войти в комнату</button>
+    </div>
+  </div>
+  <h2 style="margin-top:2rem;font-size:1.1rem;color:var(--muted)">📊 Твоя статистика</h2>
+  <div class="stats-grid" id="statsGrid"></div>
+</div>
+
+<!-- ЭКРАН 2А: ОЖИДАНИЕ HOST -->
+<div class="screen" id="waitHost">
+  <h2>Комната создана</h2>
+  <p class="muted">Передай этот код другу:</p>
+  <div class="room-code" id="roomCodeDisplay">------</div>
+  <div class="row">
+    <button class="btn cyan small" id="copyCodeBtn">📋 Копировать код</button>
+    <button class="btn small" id="shareLinkBtn">🔗 Поделиться ссылкой</button>
+  </div>
+  <div class="pulse"></div>
+  <p style="color:var(--neon)">Ожидаем соперника...</p>
+  <button class="btn ghost small" style="margin-top:1.5rem" onclick="app.backToMenu()">← Отмена</button>
+</div>
+
+<!-- ЭКРАН 2Б: ПОДКЛЮЧЕНИЕ GUEST -->
+<div class="screen" id="joinScreen">
+  <h2>Подключение к комнате</h2>
+  <div class="card flex-col" style="margin-top:1rem;width:100%;max-width:420px">
+    <label class="muted">Введи код комнаты (6 цифр)</label>
+    <input id="codeInput" maxlength="6" placeholder="000000" style="text-align:center;font-size:2rem;letter-spacing:.5em;font-family:'Orbitron',sans-serif">
+    <button class="btn cyan" id="connectBtn">Подключиться</button>
+    <div id="joinStatus" class="muted center"></div>
+  </div>
+  <button class="btn ghost small" style="margin-top:1.5rem" onclick="app.backToMenu()">← Назад</button>
+</div>
+
+<!-- ЭКРАН 3: ЛОББИ -->
+<div class="screen" id="lobby">
+  <h2>🎮 Лобби</h2>
+  <div class="connection-status">✅ Соединение установлено</div>
+  <div class="lobby-players">
+    <div class="player-pill host" id="player1Pill">Игрок 1</div>
+    <div class="vs">VS</div>
+    <div class="player-pill guest" id="player2Pill">Игрок 2</div>
+  </div>
+  <p class="muted center">Пинг: <span id="lobbyPing">--</span> ms</p>
+  
+  <h2 style="margin-top:1.5rem;font-size:1.1rem">Выберите игру</h2>
+  <div class="games-grid" id="gamesGrid">
+    <div class="game-card" data-game="tictactoe"><div class="icon">❌⭕</div><div class="name">Крестики-нолики</div></div>
+    <div class="game-card" data-game="connect4"><div class="icon">🟡</div><div class="name">Четыре в ряд</div></div>
+    <div class="game-card" data-game="pong"><div class="icon">🏓</div><div class="name">Пинг-понг</div></div>
+    <div class="game-card" data-game="battleship"><div class="icon">💣</div><div class="name">Морской бой</div></div>
+    <div class="game-card" data-game="rps"><div class="icon">✊✋✌️</div><div class="name">Камень-ножницы</div></div>
+  </div>
+
+  <div class="row">
+    <button class="btn green" id="startGameBtn" disabled>▶ Начать игру</button>
+    <button class="btn ghost" onclick="app.leaveRoom()">Выйти</button>
+  </div>
+  <p id="lobbyHint" class="muted center" style="margin-top:1rem"></p>
+</div>
+
+<!-- ЭКРАН 4: ИГРА -->
+<div class="screen" id="game">
+  <div class="game-header">
+    <div class="player-info">
+      <span id="gp1Name">Игрок 1</span>: <span class="score" id="gp1Score">0</span>
+    </div>
+    <div class="turn-indicator" id="turnIndicator">--</div>
+    <div class="player-info">
+      <span class="score" id="gp2Score">0</span> :<span id="gp2Name">Игрок 2</span>
+    </div>
+  </div>
+  <div class="game-area" id="gameArea"></div>
+  <div class="game-controls" id="gameControls">
+    <button class="btn ghost small" onclick="app.leaveToLobby()">← В лобби</button>
+  </div>
+  <div class="chat-box">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-row">
+      <input id="chatInput" placeholder="Сообщение..." maxlength="100">
+      <button class="btn cyan small" id="sendChatBtn">→</button>
+      <div class="emoji-row">
+        <button class="emoji-btn" data-emoji="👍">👍</button>
+        <button class="emoji-btn" data-emoji="😂">😂</button>
+        <button class="emoji-btn" data-emoji="😤">😤</button>
+        <button class="emoji-btn" data-emoji="🔥">🔥</button>
+        <button class="emoji-btn" data-emoji="💀">💀</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ЭКРАН РАЗРЫВ -->
+<div class="screen" id="disconnected">
+  <h1 style="font-size:3rem">⚠️</h1>
+  <h2>Соперник отключился</h2>
+  <p class="muted" id="reconnectStatus">Попытка переподключения...</p>
+  <div class="spinner" id="reconnectSpinner"></div>
+  <button class="btn ghost" onclick="app.backToMenu()">В меню</button>
+</div>
+
+</div>
+
+<canvas class="confetti-canvas hide" id="confetti"></canvas>
+
+<div class="modal" id="rematchModal">
+  <div class="modal-content">
+    <h2>🔄 Реванш?</h2>
+    <p style="margin:1rem 0">Соперник предлагает сыграть ещё раз</p>
+    <div class="row">
+      <button class="btn green" id="acceptRematch">Принять</button>
+      <button class="btn red" id="declineRematch">Отказать</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+// ============================================================
+// === SOUND MANAGER (Web Audio API, процедурные звуки) ===
+// ============================================================
+class SoundManager{
+  constructor(){
+    this.enabled=true;
+    this.ctx=null;
+  }
+  _ensure(){
+    if(!this.ctx){
+      try{this.ctx=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}
+    }
+    if(this.ctx&&this.ctx.state==='suspended')this.ctx.resume();
+  }
+  toggle(){this.enabled=!this.enabled;return this.enabled}
+  _beep(freq,duration,type='sine',vol=.15){
+    if(!this.enabled)return;
+    this._ensure();if(!this.ctx)return;
+    const o=this.ctx.createOscillator();
+    const g=this.ctx.createGain();
+    o.type=type;o.frequency.value=freq;
+    g.gain.setValueAtTime(vol,this.ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.0001,this.ctx.currentTime+duration);
+    o.connect(g);g.connect(this.ctx.destination);
+    o.start();o.stop(this.ctx.currentTime+duration);
+  }
+  playMove(){this._beep(800,.08,'square',.1)}
+  playWin(){
+    [523,659,784,1046].forEach((f,i)=>setTimeout(()=>this._beep(f,.2,'triangle',.18),i*100));
+  }
+  playLose(){
+    [400,300,200].forEach((f,i)=>setTimeout(()=>this._beep(f,.25,'sawtooth',.13),i*150));
+  }
+  playConnect(){
+    [600,900].forEach((f,i)=>setTimeout(()=>this._beep(f,.15,'sine',.15),i*100));
+  }
+  playChat(){this._beep(1200,.05,'sine',.08)}
+  playHit(){this._beep(150,.2,'sawtooth',.2)}
+  playSplash(){this._beep(2000,.15,'sine',.05)}
+}
+
+// ============================================================
+// === NETWORK MANAGER (PeerJS) ===
+// ============================================================
+class NetworkManager{
+  constructor(){
+    this.peer=null;
+    this.connection=null;
+    this.role=null;          // 'host' | 'guest'
+    this.roomCode=null;
+    this.callbacks={data:[],connect:[],disconnect:[]};
+    this.ping=0;
+    this._pingInterval=null;
+  }
+  _genCode(){
+    return Math.floor(100000+Math.random()*900000).toString();
+  }
+  _peerIdFromCode(code){return 'gz-online-'+code}
+  
+  async createRoom(){
+    return new Promise((resolve,reject)=>{
+      this.role='host';
+      this.roomCode=this._genCode();
+      const id=this._peerIdFromCode(this.roomCode);
+      this.peer=new Peer(id,{debug:1});
+      this.peer.on('open',()=>resolve(this.roomCode));
+      this.peer.on('error',err=>{
+        // Если ID занят — пробуем другой
+        if(err.type==='unavailable-id'){
+          this.peer.destroy();
+          this.createRoom().then(resolve).catch(reject);
+        }else{
+          reject(err);
+        }
+      });
+      this.peer.on('connection',conn=>{
+        this.connection=conn;
+        this._setupConn();
+      });
+    });
+  }
+  
+  async joinRoom(code){
+    return new Promise((resolve,reject)=>{
+      this.role='guest';
+      this.roomCode=code;
+      this.peer=new Peer({debug:1});
+      this.peer.on('open',()=>{
+        const conn=this.peer.connect(this._peerIdFromCode(code),{reliable:true});
+        this.connection=conn;
+        let resolved=false;
+        conn.on('open',()=>{resolved=true;this._setupConn();resolve(true)});
+        setTimeout(()=>{if(!resolved)reject(new Error('Не удалось подключиться. Проверь код.'))},10000);
+      });
+      this.peer.on('error',err=>{
+        if(!err.type||err.type==='peer-unavailable')reject(new Error('Комната не найдена'));
+        else reject(err);
+      });
+    });
+  }
+  
+  _setupConn(){
+    this.connection.on('data',d=>{
+      try{
+        const msg=typeof d==='string'?JSON.parse(d):d;
+        // Пинг-понг для измерения задержки
+        if(msg.type==='__PING'){
+          this.connection.send({type:'__PONG',payload:{t:msg.payload.t},timestamp:Date.now()});
+          return;
+        }
+        if(msg.type==='__PONG'){
+          this.ping=Date.now()-msg.payload.t;
+          return;
+        }
+        this.callbacks.data.forEach(cb=>cb(msg));
+      }catch(e){console.warn('Ошибка парсинга',e)}
+    });
+    this.connection.on('open',()=>{
+      this.callbacks.connect.forEach(cb=>cb());
+      this._startPing();
+    });
+    this.connection.on('close',()=>{
+      this._stopPing();
+      this.callbacks.disconnect.forEach(cb=>cb());
+    });
+    this.connection.on('error',()=>{
+      this.callbacks.disconnect.forEach(cb=>cb());
+    });
+    // Если уже открыто (host->guest)
+    if(this.connection.open){
+      this.callbacks.connect.forEach(cb=>cb());
+      this._startPing();
+    }
+  }
+  
+  _startPing(){
+    this._stopPing();
+    this._pingInterval=setInterval(()=>{
+      if(this.connection&&this.connection.open){
+        try{this.connection.send({type:'__PING',payload:{t:Date.now()},timestamp:Date.now()})}catch(e){}
+      }
+    },2000);
+  }
+  _stopPing(){if(this._pingInterval){clearInterval(this._pingInterval);this._pingInterval=null}}
+  
+  sendData(type,payload){
+    if(this.connection&&this.connection.open){
+      try{this.connection.send({type,payload,timestamp:Date.now()})}catch(e){console.warn(e)}
+    }
+  }
+  onData(cb){this.callbacks.data.push(cb)}
+  onConnect(cb){this.callbacks.connect.push(cb)}
+  onDisconnect(cb){this.callbacks.disconnect.push(cb)}
+  
+  destroy(){
+    this._stopPing();
+    if(this.connection){try{this.connection.close()}catch(e){}}
+    if(this.peer){try{this.peer.destroy()}catch(e){}}
+    this.connection=null;this.peer=null;
+    this.callbacks={data:[],connect:[],disconnect:[]};
+  }
+}
+
+// ============================================================
+// === БАЗОВЫЙ КЛАСС ИГРЫ ===
+// ============================================================
+class BaseGame{
+  constructor(app){
+    this.app=app;
+    this.net=app.net;
+    this.sound=app.sound;
+    this.area=document.getElementById('gameArea');
+    this.controls=document.getElementById('gameControls');
+    this.myTurn=app.net.role==='host'; // host ходит первым
+    this.scores={p1:0,p2:0};
+    this.over=false;
+  }
+  start(){this.area.innerHTML='';this.render();this.updateTurnUI()}
+  render(){}
+  onData(msg){}
+  cleanup(){}
+  updateTurnUI(){
+    const ti=document.getElementById('turnIndicator');
+    if(this.over){ti.className='turn-indicator';ti.textContent='Игра окончена';return}
+    ti.className='turn-indicator '+(this.myTurn?'my':'opp');
+    ti.textContent=this.myTurn?'ВАШ ХОД':'ХОД СОПЕРНИКА';
+  }
+  setScores(p1,p2){
+    this.scores.p1=p1;this.scores.p2=p2;
+    document.getElementById('gp1Score').textContent=p1;
+    document.getElementById('gp2Score').textContent=p2;
+  }
+  iAmP1(){return this.app.net.role==='host'}
+  endGame(iWon,isDraw=false){
+    this.over=true;this.updateTurnUI();
+    if(isDraw){
+      this.app.showToast('🤝 Ничья!');
+      this.app.recordResult(this.gameKey,'draw');
+    }else if(iWon){
+      this.sound.playWin();
+      this.app.showToast('🏆 Победа!');
+      this.app.fireConfetti();
+      this.app.recordResult(this.gameKey,'win');
+    }else{
+      this.sound.playLose();
+      this.app.showToast('💀 Поражение');
+      this.app.recordResult(this.gameKey,'loss');
+    }
+    this._showRematch();
+  }
+  _showRematch(){
+    const c=this.controls;
+    if(!c.querySelector('#rematchBtn')){
+      const b=document.createElement('button');
+      b.id='rematchBtn';b.className='btn green';b.textContent='🔄 Реванш';
+      b.onclick=()=>{
+        this.net.sendData('REMATCH_REQUEST',{});
+        this.app.showToast('Запрос отправлен...');
+        b.disabled=true;
+      };
+      c.prepend(b);
+    }
+  }
+}
+
+// ============================================================
+// === КРЕСТИКИ-НОЛИКИ ===
+// ============================================================
+class TicTacToeGame extends BaseGame{
+  constructor(app){super(app);this.gameKey='tictactoe';this.board=Array(9).fill(null);this.mySymbol=this.iAmP1()?'X':'O'}
+  render(){
+    const board=document.createElement('div');board.className='ttt-board';
+    for(let i=0;i<9;i++){
+      const c=document.createElement('div');c.className='ttt-cell';c.dataset.idx=i;
+      c.onclick=()=>this._click(i);
+      board.appendChild(c);
+    }
+    this.area.appendChild(board);
+    this.boardEl=board;
+  }
+  _click(i){
+    if(this.over||!this.myTurn||this.board[i])return;
+    this._place(i,this.mySymbol);
+    this.net.sendData('MOVE',{cell:i});
+    this.myTurn=false;this.updateTurnUI();
+    this._checkEnd();
+  }
+  _place(i,sym){
+    this.board[i]=sym;
+    const cell=this.boardEl.children[i];
+    cell.textContent=sym;
+    cell.classList.add('filled',sym==='X'?'x':'o');
+    this.sound.playMove();
+  }
+  onData(msg){
+    if(msg.type==='MOVE'){
+      const oppSym=this.mySymbol==='X'?'O':'X';
+      this._place(msg.payload.cell,oppSym);
+      this.myTurn=true;this.updateTurnUI();
+      this._checkEnd();
+    }else if(msg.type==='RESTART'){
+      this._reset(msg.payload.starterIsHost);
+    }
+  }
+  _checkEnd(){
+    const lines=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    for(const l of lines){
+      const [a,b,c]=l;
+      if(this.board[a]&&this.board[a]===this.board[b]&&this.board[a]===this.board[c]){
+        l.forEach(i=>this.boardEl.children[i].classList.add('win'));
+        const winSym=this.board[a];
+        const iWon=winSym===this.mySymbol;
+        this.setScores(
+          this.scores.p1+(winSym==='X'?1:0),
+          this.scores.p2+(winSym==='O'?1:0)
+        );
+        this.endGame(iWon);
+        return;
+      }
+    }
+    if(this.board.every(c=>c)){this.endGame(false,true)}
+  }
+  reset(starterIsHost){
+    this.board=Array(9).fill(null);this.over=false;
+    this.boardEl.querySelectorAll('.ttt-cell').forEach(c=>{c.className='ttt-cell';c.textContent=''});
+    this.myTurn=(this.iAmP1()&&starterIsHost)||(!this.iAmP1()&&!starterIsHost);
+    this.updateTurnUI();
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+  }
+}
+
+// ============================================================
+// === ЧЕТЫРЕ В РЯД ===
+// ============================================================
+class Connect4Game extends BaseGame{
+  constructor(app){super(app);this.gameKey='connect4';this.cols=7;this.rows=6;this.board=Array(7).fill(null).map(()=>Array(6).fill(null));this.myColor=this.iAmP1()?'r':'y'}
+  render(){
+    const board=document.createElement('div');board.className='c4-board';
+    this.cells=[];
+    // Сетка по строкам сверху вниз
+    for(let r=0;r<this.rows;r++){
+      for(let c=0;c<this.cols;c++){
+        const cell=document.createElement('div');cell.className='c4-cell';
+        cell.dataset.col=c;cell.dataset.row=r;
+        cell.onclick=()=>this._click(c);
+        board.appendChild(cell);
+        this.cells.push(cell);
+      }
+    }
+    this.area.appendChild(board);
+    this.boardEl=board;
+  }
+  _getCell(c,r){return this.cells[r*this.cols+c]}
+  _click(col){
+    if(this.over||!this.myTurn)return;
+    if(this._lowestEmpty(col)<0)return;
+    this._drop(col,this.myColor);
+    this.net.sendData('MOVE',{column:col});
+    this.myTurn=false;this.updateTurnUI();
+  }
+  _lowestEmpty(col){
+    for(let r=this.rows-1;r>=0;r--)if(!this.board[col][r])return r;
+    return -1;
+  }
+  _drop(col,color){
+    const r=this._lowestEmpty(col);
+    if(r<0)return false;
+    this.board[col][r]=color;
+    const cell=this._getCell(col,r);
+    cell.classList.add(color);
+    this.sound.playMove();
+    return this._checkWin(col,r,color);
+  }
+  _checkWin(col,row,color){
+    const dirs=[[1,0],[0,1],[1,1],[1,-1]];
+    for(const [dx,dy] of dirs){
+      const line=[[col,row]];
+      for(let s=1;s<4;s++){const x=col+dx*s,y=row+dy*s;if(x<0||x>=this.cols||y<0||y>=this.rows||this.board[x][y]!==color)break;line.push([x,y])}
+      for(let s=1;s<4;s++){const x=col-dx*s,y=row-dy*s;if(x<0||x>=this.cols||y<0||y>=this.rows||this.board[x][y]!==color)break;line.unshift([x,y])}
+      if(line.length>=4){
+        line.forEach(([x,y])=>this._getCell(x,y).classList.add('win'));
+        const iWon=color===this.myColor;
+        this.setScores(this.scores.p1+(color==='r'?1:0),this.scores.p2+(color==='y'?1:0));
+        this.endGame(iWon);
+        return true;
+      }
+    }
+    if(this.board.every(col=>col[0]))this.endGame(false,true);
+    return false;
+  }
+  onData(msg){
+    if(msg.type==='MOVE'){
+      const oppColor=this.myColor==='r'?'y':'r';
+      this._drop(msg.payload.column,oppColor);
+      this.myTurn=true;this.updateTurnUI();
+    }
+  }
+  reset(starterIsHost){
+    this.board=Array(7).fill(null).map(()=>Array(6).fill(null));
+    this.over=false;
+    this.cells.forEach(c=>c.className='c4-cell');
+    this.myTurn=(this.iAmP1()&&starterIsHost)||(!this.iAmP1()&&!starterIsHost);
+    this.updateTurnUI();
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+  }
+}
+
+// ============================================================
+// === ПИНГ-ПОНГ ===
+// ============================================================
+class PongGame extends BaseGame{
+  constructor(app){
+    super(app);this.gameKey='pong';
+    this.W=800;this.H=400;
+    this.paddleH=80;this.paddleW=12;
+    this.ballR=8;
+    this.leftY=this.H/2-this.paddleH/2;
+    this.rightY=this.H/2-this.paddleH/2;
+    this.ballX=this.W/2;this.ballY=this.H/2;
+    this.ballVX=5*(Math.random()<.5?-1:1);this.ballVY=(Math.random()*4-2);
+    this.scoreL=0;this.scoreR=0;
+    this.maxScore=7;
+    this.trail=[];
+    this.lastSync=0;
+    this.over=false;
+    this.amHost=this.iAmP1();
+    // У хоста инвертируем индикатор хода — здесь "ход" = "ВЫ ИГРАЕТЕ"
+  }
+  render(){
+    document.getElementById('turnIndicator').textContent='🏓 В ИГРЕ';
+    document.getElementById('turnIndicator').className='turn-indicator my';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:.5rem';
+    const canvas=document.createElement('canvas');
+    canvas.className='pong-canvas';
+    canvas.width=this.W;canvas.height=this.H;
+    canvas.style.cursor='none';
+    wrap.appendChild(canvas);
+    const hint=document.createElement('p');hint.className='muted';
+    hint.textContent=this.amHost?'Ты слева. Двигай мышью или W/S':'Ты справа. Двигай мышью или ↑/↓';
+    wrap.appendChild(hint);
+    this.area.appendChild(wrap);
+    this.canvas=canvas;this.ctx=canvas.getContext('2d');
+    
+    // Ввод
+    canvas.addEventListener('mousemove',e=>{
+      const rect=canvas.getBoundingClientRect();
+      const y=(e.clientY-rect.top)*(this.H/rect.height);
+      this._setMyPaddle(y-this.paddleH/2);
+    });
+    canvas.addEventListener('touchmove',e=>{
+      e.preventDefault();
+      const t=e.touches[0];
+      const rect=canvas.getBoundingClientRect();
+      const y=(t.clientY-rect.top)*(this.H/rect.height);
+      this._setMyPaddle(y-this.paddleH/2);
+    },{passive:false});
+    
+    this.keys={};
+    this._kd=e=>{this.keys[e.key.toLowerCase()]=true};
+    this._ku=e=>{this.keys[e.key.toLowerCase()]=false};
+    window.addEventListener('keydown',this._kd);
+    window.addEventListener('keyup',this._ku);
+    
+    this.running=true;
+    this.loop();
+  }
+  _setMyPaddle(y){
+    y=Math.max(0,Math.min(this.H-this.paddleH,y));
+    if(this.amHost){this.leftY=y}
+    else{
+      this.rightY=y;
+      this.net.sendData('MOVE',{paddleY:y});
+    }
+  }
+  loop(){
+    if(!this.running)return;
+    // Клавиатурный ввод
+    const sp=8;
+    if(this.amHost){
+      if(this.keys['w'])this._setMyPaddle(this.leftY-sp);
+      if(this.keys['s'])this._setMyPaddle(this.leftY+sp);
+    }else{
+      if(this.keys['arrowup'])this._setMyPaddle(this.rightY-sp);
+      if(this.keys['arrowdown'])this._setMyPaddle(this.rightY+sp);
+    }
+    
+    if(this.amHost){
+      this._physics();
+      const now=Date.now();
+      if(now-this.lastSync>50){
+        this.lastSync=now;
+        this.net.sendData('SYNC',{
+          ballX:this.ballX,ballY:this.ballY,
+          ballVX:this.ballVX,ballVY:this.ballVY,
+          scoreL:this.scoreL,scoreR:this.scoreR,
+          leftY:this.leftY
+        });
+      }
+    }
+    this._draw();
+    requestAnimationFrame(()=>this.loop());
+  }
+  _physics(){
+    if(this.over)return;
+    this.ballX+=this.ballVX;this.ballY+=this.ballVY;
+    if(this.ballY<=this.ballR){this.ballY=this.ballR;this.ballVY*=-1}
+    if(this.ballY>=this.H-this.ballR){this.ballY=this.H-this.ballR;this.ballVY*=-1}
+    // Левая ракетка
+    if(this.ballX-this.ballR<=this.paddleW+5 && this.ballX>0){
+      if(this.ballY>=this.leftY&&this.ballY<=this.leftY+this.paddleH){
+        this.ballVX=Math.abs(this.ballVX)*1.05;
+        const off=(this.ballY-(this.leftY+this.paddleH/2))/(this.paddleH/2);
+        this.ballVY=off*6;
+        this.sound.playMove();
+      }
+    }
+    // Правая ракетка
+    if(this.ballX+this.ballR>=this.W-this.paddleW-5){
+      if(this.ballY>=this.rightY&&this.ballY<=this.rightY+this.paddleH){
+        this.ballVX=-Math.abs(this.ballVX)*1.05;
+        const off=(this.ballY-(this.rightY+this.paddleH/2))/(this.paddleH/2);
+        this.ballVY=off*6;
+        this.sound.playMove();
+      }
+    }
+    // Гол
+    if(this.ballX<-20){
+      this.scoreR++;this._resetBall(1);this._scoreUpdate();
+    }else if(this.ballX>this.W+20){
+      this.scoreL++;this._resetBall(-1);this._scoreUpdate();
+    }
+    // Ограничиваем скорость
+    this.ballVX=Math.max(-15,Math.min(15,this.ballVX));
+  }
+  _scoreUpdate(){
+    this.setScores(this.scoreL,this.scoreR);
+    if(this.scoreL>=this.maxScore){
+      this.over=true;
+      this.net.sendData('SYNC',{ballX:this.ballX,ballY:this.ballY,ballVX:0,ballVY:0,scoreL:this.scoreL,scoreR:this.scoreR,leftY:this.leftY,gameOver:true,winner:'L'});
+      this.endGame(this.amHost);
+    }else if(this.scoreR>=this.maxScore){
+      this.over=true;
+      this.net.sendData('SYNC',{ballX:this.ballX,ballY:this.ballY,ballVX:0,ballVY:0,scoreL:this.scoreL,scoreR:this.scoreR,leftY:this.leftY,gameOver:true,winner:'R'});
+      this.endGame(!this.amHost);
+    }
+  }
+  _resetBall(dir){
+    this.ballX=this.W/2;this.ballY=this.H/2;
+    this.ballVX=5*dir;this.ballVY=(Math.random()*4-2);
+  }
+  _draw(){
+    const ctx=this.ctx;
+    ctx.fillStyle='rgba(2,2,10,.3)';ctx.fillRect(0,0,this.W,this.H);
+    // Центр
+    ctx.strokeStyle='rgba(0,240,255,.3)';ctx.setLineDash([10,15]);ctx.lineWidth=2;
+    ctx.beginPath();ctx.moveTo(this.W/2,0);ctx.lineTo(this.W/2,this.H);ctx.stroke();
+    ctx.setLineDash([]);
+    // Trail
+    this.trail.push({x:this.ballX,y:this.ballY});
+    if(this.trail.length>15)this.trail.shift();
+    this.trail.forEach((p,i)=>{
+      const a=i/this.trail.length;
+      ctx.fillStyle=`rgba(0,240,255,${a*0.5})`;
+      ctx.beginPath();ctx.arc(p.x,p.y,this.ballR*a,0,Math.PI*2);ctx.fill();
+    });
+    // Мяч
+    ctx.shadowBlur=20;ctx.shadowColor='#00f0ff';
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(this.ballX,this.ballY,this.ballR,0,Math.PI*2);ctx.fill();
+    ctx.shadowBlur=0;
+    // Ракетки
+    ctx.shadowBlur=15;ctx.shadowColor='#ff00e5';
+    ctx.fillStyle='#ff00e5';ctx.fillRect(5,this.leftY,this.paddleW,this.paddleH);
+    ctx.shadowColor='#00f0ff';ctx.fillStyle='#00f0ff';
+    ctx.fillRect(this.W-this.paddleW-5,this.rightY,this.paddleW,this.paddleH);
+    ctx.shadowBlur=0;
+    // Счёт
+    ctx.font='bold 48px Orbitron, sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.2)';ctx.textAlign='center';
+    ctx.fillText(this.scoreL,this.W/2-80,60);
+    ctx.fillText(this.scoreR,this.W/2+80,60);
+  }
+  onData(msg){
+    if(msg.type==='SYNC'&&!this.amHost){
+      this.ballX=msg.payload.ballX;this.ballY=msg.payload.ballY;
+      this.ballVX=msg.payload.ballVX;this.ballVY=msg.payload.ballVY;
+      this.scoreL=msg.payload.scoreL;this.scoreR=msg.payload.scoreR;
+      this.leftY=msg.payload.leftY;
+      this.setScores(this.scoreL,this.scoreR);
+      if(msg.payload.gameOver&&!this.over){
+        this.over=true;
+        const iWon=(msg.payload.winner==='R');
+        this.endGame(iWon);
+      }
+    }else if(msg.type==='MOVE'&&this.amHost){
+      this.rightY=msg.payload.paddleY;
+    }
+  }
+  reset(){
+    this.scoreL=0;this.scoreR=0;
+    this._resetBall(Math.random()<.5?-1:1);
+    this.over=false;
+    this.setScores(0,0);
+    document.getElementById('turnIndicator').className='turn-indicator my';
+    document.getElementById('turnIndicator').textContent='🏓 В ИГРЕ';
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+  }
+  cleanup(){
+    this.running=false;
+    window.removeEventListener('keydown',this._kd);
+    window.removeEventListener('keyup',this._ku);
+  }
+}
+
+// ============================================================
+// === МОРСКОЙ БОЙ ===
+// ============================================================
+class BattleshipGame extends BaseGame{
+  constructor(app){
+    super(app);this.gameKey='battleship';
+    this.size=10;
+    this.myBoard=this._emptyBoard();
+    this.enemyShots=this._emptyBoard();  // что соперник стрелял по моему полю (видим)
+    this.myShots=this._emptyBoard();     // мои выстрелы
+    this.myShips=[];      // [{id,cells:[[x,y]...],hits:0}]
+    this.phase='place';
+    this.bothReady=false;
+    this.imReady=false;
+    this.oppReady=false;
+    // Для морского боя — фаза расстановки одновременно, потом ходы
+    this.shipsTemplate=[
+      {id:'s4',size:4,count:1},
+      {id:'s3',size:3,count:2},
+      {id:'s2',size:2,count:3},
+      {id:'s1',size:1,count:4}
+    ];
+    this.placedShips=[];   // {templateId,size,cells}
+    this.pendingPlace={size:null,horizontal:true,templateId:null,placedIdx:0};
+    this.shipPlacedCounters={};
+    this.shipsTemplate.forEach(s=>this.shipPlacedCounters[s.id]=0);
+  }
+  _emptyBoard(){return Array(this.size).fill(null).map(()=>Array(this.size).fill(0))}
+  
+  render(){
+    this.area.innerHTML='';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;gap:1rem;align-items:center;width:100%';
+    
+    if(this.phase==='place'){
+      this._renderPlacement(wrap);
+    }else{
+      this._renderBattle(wrap);
+    }
+    this.area.appendChild(wrap);
+  }
+  
+  _renderPlacement(wrap){
+    document.getElementById('turnIndicator').textContent='РАССТАНОВКА';
+    document.getElementById('turnIndicator').className='turn-indicator';
+    
+    const title=document.createElement('h3');title.textContent='Расставьте корабли';title.style.fontFamily='Orbitron';
+    wrap.appendChild(title);
+    
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;align-items:flex-start';
+    
+    // Банк кораблей
+    const bank=document.createElement('div');bank.className='bs-ships-bank';
+    const bankTitle=document.createElement('div');bankTitle.style.cssText='font-weight:700;color:var(--neon)';bankTitle.textContent='Корабли:';
+    bank.appendChild(bankTitle);
+    
+    this.shipsTemplate.forEach(s=>{
+      for(let i=0;i<s.count;i++){
+        const item=document.createElement('div');item.className='bs-ship-item';
+        item.dataset.tid=s.id;item.dataset.idx=i;
+        for(let k=0;k<s.size;k++){const seg=document.createElement('div');seg.className='seg';item.appendChild(seg)}
+        item.onclick=()=>{
+          if(item.classList.contains('placed'))return;
+          bank.querySelectorAll('.bs-ship-item').forEach(b=>b.classList.remove('selected'));
+          item.classList.add('selected');
+          this.pendingPlace.size=s.size;
+          this.pendingPlace.templateId=s.id;
+          this.pendingPlace.placedIdx=i;
+        };
+        bank.appendChild(item);
+      }
+    });
+    
+    const rotateBtn=document.createElement('button');rotateBtn.className='btn cyan small';
+    rotateBtn.textContent='⟳ Поворот (R)';
+    rotateBtn.onclick=()=>{this.pendingPlace.horizontal=!this.pendingPlace.horizontal;this.app.showToast(this.pendingPlace.horizontal?'↔ Горизонтально':'↕ Вертикально')};
+    bank.appendChild(rotateBtn);
+    
+    const autoBtn=document.createElement('button');autoBtn.className='btn small';
+    autoBtn.textContent='🎲 Авто';
+    autoBtn.onclick=()=>this._autoPlace();
+    bank.appendChild(autoBtn);
+    
+    const clearBtn=document.createElement('button');clearBtn.className='btn ghost small';
+    clearBtn.textContent='✖ Очистить';
+    clearBtn.onclick=()=>this._clearPlacement();
+    bank.appendChild(clearBtn);
+    
+    row.appendChild(bank);
+    
+    // Поле
+    const boardWrap=document.createElement('div');boardWrap.className='bs-side';
+    const boardTitle=document.createElement('h3');boardTitle.textContent='Ваше поле';
+    boardWrap.appendChild(boardTitle);
+    const board=document.createElement('div');board.className='bs-board';
+    this.placeCells=[];
+    for(let y=0;y<this.size;y++){
+      for(let x=0;x<this.size;x++){
+        const c=document.createElement('div');c.className='bs-cell';c.dataset.x=x;c.dataset.y=y;
+        c.onmouseenter=()=>this._previewPlace(x,y);
+        c.onmouseleave=()=>this._clearPreview();
+        c.onclick=()=>this._tryPlaceAt(x,y);
+        board.appendChild(c);
+        this.placeCells.push(c);
+      }
+    }
+    boardWrap.appendChild(board);
+    this.placeBoardEl=board;
+    row.appendChild(boardWrap);
+    
+    wrap.appendChild(row);
+    
+    // Готов
+    const readyRow=document.createElement('div');readyRow.className='row';
+    const readyBtn=document.createElement('button');readyBtn.className='btn green';readyBtn.textContent='✓ Готов';
+    readyBtn.id='bsReadyBtn';readyBtn.disabled=true;
+    readyBtn.onclick=()=>this._sendReady();
+    readyRow.appendChild(readyBtn);
+    
+    const status=document.createElement('div');status.id='bsPlacementStatus';status.className='muted';
+    status.textContent='Размести все 10 кораблей';
+    readyRow.appendChild(status);
+    
+    wrap.appendChild(readyRow);
+    
+    // Клавиша R
+    this._rotateKey=e=>{if(e.key==='r'||e.key==='R'){this.pendingPlace.horizontal=!this.pendingPlace.horizontal}};
+    window.addEventListener('keydown',this._rotateKey);
+    
+    this._refreshPlaceBoard();
+  }
+  
+  _autoPlace(){
+    this._clearPlacement();
+    const ships=[];
+    this.shipsTemplate.forEach(s=>{
+      for(let i=0;i<s.count;i++){
+        let placed=false;
+        for(let attempt=0;attempt<200&&!placed;attempt++){
+          const horiz=Math.random()<.5;
+          const x=Math.floor(Math.random()*this.size);
+          const y=Math.floor(Math.random()*this.size);
+          const cells=[];
+          for(let k=0;k<s.size;k++){
+            const cx=horiz?x+k:x;const cy=horiz?y:y+k;
+            cells.push([cx,cy]);
+          }
+          if(this._validPlacement(cells)){
+            cells.forEach(([cx,cy])=>this.myBoard[cy][cx]=1);
+            this.placedShips.push({templateId:s.id,size:s.size,cells});
+            this.shipPlacedCounters[s.id]++;
+            placed=true;
+          }
+        }
+      }
+    });
+    this._refreshPlaceBoard();
+    this._refreshBank();
+    this._updatePlacementStatus();
+  }
+  
+  _clearPlacement(){
+    this.myBoard=this._emptyBoard();
+    this.placedShips=[];
+    this.shipsTemplate.forEach(s=>this.shipPlacedCounters[s.id]=0);
+    this._refreshPlaceBoard();
+    this._refreshBank();
+    this._updatePlacementStatus();
+  }
+  
+  _refreshBank(){
+    const bank=this.area.querySelector('.bs-ships-bank');
+    if(!bank)return;
+    const items=bank.querySelectorAll('.bs-ship-item');
+    const counts={};
+    this.shipsTemplate.forEach(s=>counts[s.id]=0);
+    this.placedShips.forEach(p=>counts[p.templateId]++);
+    let processed={};
+    this.shipsTemplate.forEach(s=>processed[s.id]=0);
+    items.forEach(item=>{
+      const tid=item.dataset.tid;
+      if(processed[tid]<counts[tid]){
+        item.classList.add('placed');
+        processed[tid]++;
+      }else{
+        item.classList.remove('placed');
+      }
+    });
+  }
+  
+  _refreshPlaceBoard(){
+    if(!this.placeCells)return;
+    this.placeCells.forEach(c=>{c.className='bs-cell'});
+    for(let y=0;y<this.size;y++)for(let x=0;x<this.size;x++)if(this.myBoard[y][x])this.placeCells[y*this.size+x].classList.add('ship');
+  }
+  
+  _previewPlace(x,y){
+    if(!this.pendingPlace.size)return;
+    this._clearPreview();
+    const cells=[];
+    for(let k=0;k<this.pendingPlace.size;k++){
+      const cx=this.pendingPlace.horizontal?x+k:x;
+      const cy=this.pendingPlace.horizontal?y:y+k;
+      cells.push([cx,cy]);
+    }
+    const valid=this._validPlacement(cells);
+    cells.forEach(([cx,cy])=>{
+      if(cx>=0&&cx<this.size&&cy>=0&&cy<this.size){
+        const c=this.placeCells[cy*this.size+cx];
+        c.classList.add(valid?'placing':'invalid');
+      }
+    });
+  }
+  _clearPreview(){
+    this.placeCells.forEach(c=>c.classList.remove('placing','invalid'));
+  }
+  
+  _validPlacement(cells){
+    for(const [x,y] of cells){
+      if(x<0||x>=this.size||y<0||y>=this.size)return false;
+      if(this.myBoard[y][x])return false;
+      // проверка соседних клеток
+      for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++){
+        const nx=x+dx,ny=y+dy;
+        if(nx>=0&&nx<this.size&&ny>=0&&ny<this.size&&this.myBoard[ny][nx])return false;
+      }
+    }
+    return true;
+  }
+  
+  _tryPlaceAt(x,y){
+    if(!this.pendingPlace.size)return;
+    const cells=[];
+    for(let k=0;k<this.pendingPlace.size;k++){
+      const cx=this.pendingPlace.horizontal?x+k:x;
+      const cy=this.pendingPlace.horizontal?y:y+k;
+      cells.push([cx,cy]);
+    }
+    if(!this._validPlacement(cells))return;
+    cells.forEach(([cx,cy])=>this.myBoard[cy][cx]=1);
+    this.placedShips.push({templateId:this.pendingPlace.templateId,size:this.pendingPlace.size,cells});
+    this.shipPlacedCounters[this.pendingPlace.templateId]++;
+    this.pendingPlace.size=null;this.pendingPlace.templateId=null;
+    this._refreshPlaceBoard();
+    this._refreshBank();
+    this._clearPreview();
+    this._updatePlacementStatus();
+  }
+  
+  _updatePlacementStatus(){
+    const totalNeeded=this.shipsTemplate.reduce((a,s)=>a+s.count,0);
+    const placed=this.placedShips.length;
+    const status=document.getElementById('bsPlacementStatus');
+    const btn=document.getElementById('bsReadyBtn');
+    if(status)status.textContent=`Размещено ${placed}/${totalNeeded}`;
+    if(btn)btn.disabled=placed!==totalNeeded;
+  }
+  
+  _sendReady(){
+    this.imReady=true;
+    this.net.sendData('READY',{ships:this.placedShips});
+    document.getElementById('bsReadyBtn').disabled=true;
+    document.getElementById('bsReadyBtn').textContent='Ожидаем соперника...';
+    this.app.showToast('Ждём соперника');
+    this._tryStartBattle();
+  }
+  
+  onData(msg){
+    if(msg.type==='READY'){
+      this.oppShips=msg.payload.ships;
+      this.oppReady=true;
+      // Покажем уведомление
+      if(!this.imReady)this.app.showToast('Соперник готов!');
+      this._tryStartBattle();
+    }else if(msg.type==='MOVE'&&this.phase==='battle'){
+      // Соперник стреляет по моему полю
+      const {x,y}=msg.payload;
+      let hit=false,sunk=false,shipId=null,sunkCells=null;
+      for(const ship of this.placedShips){
+        if(ship.cells.some(([cx,cy])=>cx===x&&cy===y)){
+          hit=true;
+          ship.hits=(ship.hits||0)+1;
+          if(ship.hits>=ship.size){
+            sunk=true;shipId=ship.templateId+'_'+this.placedShips.indexOf(ship);
+            sunkCells=ship.cells;
+          }
+          break;
+        }
+      }
+      this.enemyShots[y][x]=hit?2:1;
+      this._refreshBattleBoards();
+      if(hit)this.sound.playHit();else this.sound.playSplash();
+      this.net.sendData('RESULT',{x,y,hit,sunk,shipId,sunkCells});
+      if(!hit){this.myTurn=true;this.updateTurnUI()}
+      // Проверка победы соперника
+      const totalShipCells=this.placedShips.reduce((a,s)=>a+s.size,0);
+      let myHitsTaken=0;
+      for(let yy=0;yy<this.size;yy++)for(let xx=0;xx<this.size;xx++)if(this.enemyShots[yy][xx]===2)myHitsTaken++;
+      if(myHitsTaken>=totalShipCells){
+        this.endGame(false);
+      }
+    }else if(msg.type==='RESULT'&&this.phase==='battle'){
+      const {x,y,hit,sunk,sunkCells}=msg.payload;
+      this.myShots[y][x]=hit?2:1;
+      if(sunk&&sunkCells){
+        sunkCells.forEach(([cx,cy])=>this.myShots[cy][cx]=3);
+      }
+      this._refreshBattleBoards();
+      if(hit)this.sound.playHit();else this.sound.playSplash();
+      if(!hit){this.myTurn=false;this.updateTurnUI()}
+      // Проверка моей победы — сколько кораблей у соперника утоплено
+      const totalEnemyShipCells=this.shipsTemplate.reduce((a,s)=>a+s.size*s.count,0);
+      let myHits=0;
+      for(let yy=0;yy<this.size;yy++)for(let xx=0;xx<this.size;xx++)if(this.myShots[yy][xx]===2||this.myShots[yy][xx]===3)myHits++;
+      if(myHits>=totalEnemyShipCells){
+        this.setScores(this.scores.p1+(this.iAmP1()?1:0),this.scores.p2+(this.iAmP1()?0:1));
+        this.endGame(true);
+      }
+    }
+  }
+  
+  _tryStartBattle(){
+    if(this.imReady&&this.oppReady){
+      this.phase='battle';
+      this.myTurn=this.iAmP1(); // host начинает
+      this._renderBattlePhase();
+    }
+  }
+  
+  _renderBattlePhase(){
+    if(this._rotateKey)window.removeEventListener('keydown',this._rotateKey);
+    this.area.innerHTML='';
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;gap:1rem;align-items:center;width:100%';
+    this._renderBattle(wrap);
+    this.area.appendChild(wrap);
+    this.updateTurnUI();
+  }
+  
+  _renderBattle(wrap){
+    const cont=document.createElement('div');cont.className='bs-container';
+    
+    // Моё поле
+    const mySide=document.createElement('div');mySide.className='bs-side';
+    const mh=document.createElement('h3');mh.textContent='🛡️ Ваше поле';mySide.appendChild(mh);
+    const myB=document.createElement('div');myB.className='bs-board';
+    this.myBoardCells=[];
+    for(let y=0;y<this.size;y++){
+      for(let x=0;x<this.size;x++){
+        const c=document.createElement('div');c.className='bs-cell';
+        myB.appendChild(c);this.myBoardCells.push(c);
+      }
+    }
+    mySide.appendChild(myB);
+    cont.appendChild(mySide);
+    
+    // Поле врага
+    const enemySide=document.createElement('div');enemySide.className='bs-side';
+    const eh=document.createElement('h3');eh.textContent='🎯 Поле соперника';enemySide.appendChild(eh);
+    const enB=document.createElement('div');enB.className='bs-board';
+    this.enemyBoardCells=[];
+    for(let y=0;y<this.size;y++){
+      for(let x=0;x<this.size;x++){
+        const c=document.createElement('div');c.className='bs-cell enemy';c.dataset.x=x;c.dataset.y=y;
+        c.onclick=()=>this._shoot(x,y);
+        enB.appendChild(c);this.enemyBoardCells.push(c);
+      }
+    }
+    enemySide.appendChild(enB);
+    cont.appendChild(enemySide);
+    
+    wrap.appendChild(cont);
+    this._refreshBattleBoards();
+  }
+  
+  _refreshBattleBoards(){
+    if(!this.myBoardCells)return;
+    // Моё поле
+    for(let y=0;y<this.size;y++){
+      for(let x=0;x<this.size;x++){
+        const c=this.myBoardCells[y*this.size+x];
+        c.className='bs-cell';
+        if(this.myBoard[y][x])c.classList.add('ship');
+        if(this.enemyShots[y][x]===1){c.classList.remove('ship');c.classList.add('miss')}
+        if(this.enemyShots[y][x]===2)c.classList.add('hit');
+      }
+    }
+    // Поле врага
+    for(let y=0;y<this.size;y++){
+      for(let x=0;x<this.size;x++){
+        const c=this.enemyBoardCells[y*this.size+x];
+        c.className='bs-cell enemy';
+        if(this.myShots[y][x]===1)c.classList.add('miss');
+        if(this.myShots[y][x]===2)c.classList.add('hit');
+        if(this.myShots[y][x]===3)c.classList.add('sunk');
+      }
+    }
+  }
+  
+  _shoot(x,y){
+    if(this.over||!this.myTurn)return;
+    if(this.myShots[y][x]!==0)return;
+    this.myTurn=false;this.updateTurnUI();
+    this.net.sendData('MOVE',{x,y});
+  }
+  
+  reset(){
+    this.myBoard=this._emptyBoard();
+    this.enemyShots=this._emptyBoard();
+    this.myShots=this._emptyBoard();
+    this.placedShips=[];
+    this.over=false;
+    this.imReady=false;this.oppReady=false;
+    this.phase='place';
+    this.shipsTemplate.forEach(s=>this.shipPlacedCounters[s.id]=0);
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+    this.render();
+  }
+  
+  cleanup(){
+    if(this._rotateKey)window.removeEventListener('keydown',this._rotateKey);
+  }
+}
+
+// ============================================================
+// === КАМЕНЬ-НОЖНИЦЫ-БУМАГА ===
+// ============================================================
+class RPSGame extends BaseGame{
+  constructor(app){
+    super(app);this.gameKey='rps';
+    this.maxWins=5;
+    this.myChoice=null;this.oppChoice=null;
+    this.round=1;
+    this.myTurn=true; // оба ходят одновременно
+  }
+  render(){
+    document.getElementById('turnIndicator').textContent=`РАУНД ${this.round}`;
+    document.getElementById('turnIndicator').className='turn-indicator my';
+    
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%';
+    
+    const arena=document.createElement('div');arena.className='rps-arena';
+    
+    const left=document.createElement('div');left.className='rps-side';
+    const lname=document.createElement('div');lname.style.fontWeight='700';lname.textContent=this.app.player1Name;
+    const ldisp=document.createElement('div');ldisp.className='rps-display';ldisp.id='rpsLeft';ldisp.textContent='?';
+    left.append(lname,ldisp);
+    
+    const vs=document.createElement('div');vs.className='rps-vs';vs.id='rpsVs';vs.textContent='VS';
+    
+    const right=document.createElement('div');right.className='rps-side';
+    const rname=document.createElement('div');rname.style.fontWeight='700';rname.textContent=this.app.player2Name;
+    const rdisp=document.createElement('div');rdisp.className='rps-display';rdisp.id='rpsRight';rdisp.textContent='?';
+    right.append(rname,rdisp);
+    
+    arena.append(left,vs,right);
+    wrap.appendChild(arena);
+    
+    const btnRow=document.createElement('div');btnRow.className='rps-buttons';
+    [['rock','✊'],['paper','✋'],['scissors','✌️']].forEach(([key,emoji])=>{
+      const b=document.createElement('button');b.className='rps-btn';b.textContent=emoji;b.dataset.choice=key;
+      b.onclick=()=>this._choose(key);
+      btnRow.appendChild(b);
+    });
+    wrap.appendChild(btnRow);
+    
+    const status=document.createElement('div');status.id='rpsStatus';status.className='muted';
+    status.textContent='Сделай свой выбор';
+    wrap.appendChild(status);
+    
+    this.area.appendChild(wrap);
+    this.btnRow=btnRow;
+  }
+  _choose(key){
+    if(this.over||this.myChoice)return;
+    this.myChoice=key;
+    this.btnRow.querySelectorAll('.rps-btn').forEach(b=>{
+      b.disabled=true;
+      if(b.dataset.choice===key)b.classList.add('chosen');
+    });
+    document.getElementById('rpsStatus').textContent=this.oppChoice?'Раскрытие...':'Ожидаем соперника...';
+    this.sound.playMove();
+    this.net.sendData('MOVE',{choice:key});
+    this._tryReveal();
+  }
+  onData(msg){
+    if(msg.type==='MOVE'){
+      this.oppChoice=msg.payload.choice;
+      if(this.myChoice)this._tryReveal();
+      else document.getElementById('rpsStatus').textContent='Соперник выбрал. Твой ход!';
+    }
+  }
+  _tryReveal(){
+    if(!this.myChoice||!this.oppChoice)return;
+    // Анимация 3-2-1
+    const status=document.getElementById('rpsStatus');
+    let n=3;
+    status.innerHTML=`<div class="rps-countdown">${n}</div>`;
+    const iv=setInterval(()=>{
+      n--;
+      if(n>0){status.innerHTML=`<div class="rps-countdown">${n}</div>`}
+      else if(n===0){status.innerHTML=`<div class="rps-countdown">БУМ!</div>`}
+      else{clearInterval(iv);this._reveal()}
+    },600);
+  }
+  _reveal(){
+    const emojis={rock:'✊',paper:'✋',scissors:'✌️'};
+    const lEl=document.getElementById('rpsLeft');
+    const rEl=document.getElementById('rpsRight');
+    const myEmoji=emojis[this.myChoice];
+    const oppEmoji=emojis[this.oppChoice];
+    if(this.iAmP1()){lEl.textContent=myEmoji;rEl.textContent=oppEmoji}
+    else{lEl.textContent=oppEmoji;rEl.textContent=myEmoji}
+    lEl.classList.add('shake');rEl.classList.add('shake');
+    setTimeout(()=>{lEl.classList.remove('shake');rEl.classList.remove('shake')},1000);
+    
+    const winner=this._whoWins(this.myChoice,this.oppChoice); // 'me'|'opp'|'draw'
+    let status='🤝 Ничья!';
+    if(winner==='me'){
+      this.setScores(this.scores.p1+(this.iAmP1()?1:0),this.scores.p2+(this.iAmP1()?0:1));
+      status='✅ Вы выиграли раунд!';
+      (this.iAmP1()?lEl:rEl).classList.add('win');
+      (this.iAmP1()?rEl:lEl).classList.add('lose');
+    }else if(winner==='opp'){
+      this.setScores(this.scores.p1+(this.iAmP1()?0:1),this.scores.p2+(this.iAmP1()?1:0));
+      status='❌ Соперник выиграл раунд';
+      (this.iAmP1()?rEl:lEl).classList.add('win');
+      (this.iAmP1()?lEl:rEl).classList.add('lose');
+    }
+    document.getElementById('rpsStatus').textContent=status;
+    
+    // Проверка победы серии
+    if(this.scores.p1>=this.maxWins){
+      this.endGame(this.iAmP1());return;
+    }
+    if(this.scores.p2>=this.maxWins){
+      this.endGame(!this.iAmP1());return;
+    }
+    
+    // Следующий раунд
+    setTimeout(()=>{
+      this.round++;
+      this.myChoice=null;this.oppChoice=null;
+      lEl.textContent='?';rEl.textContent='?';
+      lEl.classList.remove('win','lose');rEl.classList.remove('win','lose');
+      this.btnRow.querySelectorAll('.rps-btn').forEach(b=>{b.disabled=false;b.classList.remove('chosen')});
+      document.getElementById('rpsStatus').textContent='Сделай свой выбор';
+      document.getElementById('turnIndicator').textContent=`РАУНД ${this.round}`;
+    },2200);
+  }
+  _whoWins(a,b){
+    if(a===b)return 'draw';
+    if((a==='rock'&&b==='scissors')||(a==='paper'&&b==='rock')||(a==='scissors'&&b==='paper'))return 'me';
+    return 'opp';
+  }
+  reset(){
+    this.over=false;this.myChoice=null;this.oppChoice=null;this.round=1;
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+    this.area.innerHTML='';this.render();
+  }
+}
+
+// ============================================================
+// === ГЛАВНОЕ ПРИЛОЖЕНИЕ ===
+// ============================================================
+class App{
+  constructor(){
+    this.net=new NetworkManager();
+    this.sound=new SoundManager();
+    this.currentGame=null;
+    this.currentGameKey=null;
+    this.player1Name='Игрок 1';
+    this.player2Name='Игрок 2';
+    this.chatMessages=[];
+    this.lobbySelectedGame=null;
+    this.rematchPending=false;
+    
+    this._initUI();
+    this._initNet();
+    this._loadStats();
+    this._renderStats();
+    this._checkURLRoom();
+    this._startConnUpdate();
+  }
+  
+  _initUI(){
+    // Никнейм
+    const nick=document.getElementById('nickInput');
+    nick.value=localStorage.getItem('nickname')||'Игрок'+Math.floor(Math.random()*1000);
+    nick.addEventListener('change',()=>{localStorage.setItem('nickname',nick.value.trim()||'Игрок')});
+    nick.addEventListener('input',()=>{localStorage.setItem('nickname',nick.value.trim()||'Игрок')});
+    
+    // Кнопки меню
+    document.getElementById('createRoomBtn').onclick=()=>this.createRoom();
+    document.getElementById('joinRoomBtn').onclick=()=>this.showJoinScreen();
+    
+    // Скопировать код
+    document.getElementById('copyCodeBtn').onclick=()=>{
+      navigator.clipboard.writeText(this.net.roomCode).then(()=>this.showToast('📋 Скопировано!'));
+    };
+    document.getElementById('shareLinkBtn').onclick=()=>{
+      const url=location.origin+location.pathname+'?room='+this.net.roomCode;
+      navigator.clipboard.writeText(url).then(()=>this.showToast('🔗 Ссылка скопирована!'));
+    };
+    
+    // Ввод кода
+    const codeInput=document.getElementById('codeInput');
+    codeInput.addEventListener('input',e=>{e.target.value=e.target.value.replace(/\D/g,'').slice(0,6)});
+    document.getElementById('connectBtn').onclick=()=>this.joinRoom(codeInput.value);
+    codeInput.addEventListener('keydown',e=>{if(e.key==='Enter')this.joinRoom(codeInput.value)});
+    
+    // Карточки игр
+    document.querySelectorAll('.game-card').forEach(card=>{
+      card.onclick=()=>{
+        if(this.net.role!=='host')return;
+        document.querySelectorAll('.game-card').forEach(c=>c.classList.remove('selected'));
+        card.classList.add('selected');
+        this.lobbySelectedGame=card.dataset.game;
+        document.getElementById('startGameBtn').disabled=false;
+        // Сообщить гостю выбор
+        this.net.sendData('LOBBY_SELECT',{game:this.lobbySelectedGame});
+      };
+    });
+    document.getElementById('startGameBtn').onclick=()=>{
+      if(!this.lobbySelectedGame)return;
+      this.net.sendData('START_GAME',{game:this.lobbySelectedGame});
+      this._startGame(this.lobbySelectedGame);
+    };
+    
+    // Чат
+    const chatInput=document.getElementById('chatInput');
+    document.getElementById('sendChatBtn').onclick=()=>this._sendChat(chatInput.value);
+    chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')this._sendChat(chatInput.value)});
+    document.querySelectorAll('.emoji-btn').forEach(b=>{
+      b.onclick=()=>this._sendChat(b.dataset.emoji);
+    });
+    
+    // Звук
+    document.getElementById('soundBtn').onclick=()=>{
+      const on=this.sound.toggle();
+      document.getElementById('soundBtn').textContent=on?'🔊':'🔇';
+    };
+    
+    // Рематч-модал
+    document.getElementById('acceptRematch').onclick=()=>{
+      document.getElementById('rematchModal').classList.remove('active');
+      this.net.sendData('REMATCH_ACCEPT',{});
+      this._doRematch();
+    };
+    document.getElementById('declineRematch').onclick=()=>{
+      document.getElementById('rematchModal').classList.remove('active');
+      this.net.sendData('REMATCH_DECLINE',{});
+    };
+  }
+  
+  _initNet(){
+    this.net.onConnect(()=>{
+      this.sound.playConnect();
+      this._enterLobby();
+    });
+    this.net.onDisconnect(()=>{
+      if(this.currentScreen!=='menu')this._showDisconnected();
+    });
+    this.net.onData(msg=>this._handleData(msg));
+  }
+  
+  _checkURLRoom(){
+    const params=new URLSearchParams(location.search);
+    const room=params.get('room');
+    if(room&&/^\d{6}$/.test(room)){
+      this.showJoinScreen();
+      document.getElementById('codeInput').value=room;
+      // Автоподключение через секунду
+      setTimeout(()=>this.joinRoom(room),500);
+    }
+  }
+  
+  _startConnUpdate(){
+    setInterval(()=>{
+      if(this.net.connection&&this.net.connection.open){
+        const ind=document.getElementById('connIndicator');
+        ind.style.display='flex';
+        const dot=document.getElementById('connDot');
+        const text=document.getElementById('connText');
+        const p=this.net.ping||0;
+        text.textContent=p+'ms';
+        dot.className='dot '+(p<100?'green':p<300?'yellow':'red');
+        const lp=document.getElementById('lobbyPing');
+        if(lp)lp.textContent=p;
+      }else{
+        document.getElementById('connIndicator').style.display='none';
+      }
+    },1000);
+  }
+  
+  showScreen(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    this.currentScreen=id;
+  }
+  
+  async createRoom(){
+    try{
+      this.showScreen('waitHost');
+      document.getElementById('roomCodeDisplay').textContent='...';
+      const code=await this.net.createRoom();
+      document.getElementById('roomCodeDisplay').textContent=code;
+      localStorage.setItem('lastRoom',code);
+    }catch(e){
+      this.showToast('Ошибка: '+e.message);
+      this.backToMenu();
+    }
+  }
+  
+  showJoinScreen(){
+    this.showScreen('joinScreen');
+    setTimeout(()=>document.getElementById('codeInput').focus(),100);
+    const last=localStorage.getItem('lastRoom');
+    if(last&&!document.getElementById('codeInput').value)document.getElementById('codeInput').value=last;
+  }
+  
+  async joinRoom(code){
+    if(!/^\d{6}$/.test(code)){this.showToast('Введи 6-значный код');return}
+    const status=document.getElementById('joinStatus');
+    status.innerHTML='<div class="spinner"></div>Подключаемся...';
+    document.getElementById('connectBtn').disabled=true;
+    try{
+      await this.net.joinRoom(code);
+      localStorage.setItem('lastRoom',code);
+      // onConnect вызовется автоматически
+    }catch(e){
+      status.innerHTML='<span style="color:var(--red)">'+e.message+'</span>';
+      document.getElementById('connectBtn').disabled=false;
+    }
+  }
+  
+  _enterLobby(){
+    // Отправим своё имя и получим имя соперника
+    const myName=(document.getElementById('nickInput').value.trim()||'Игрок');
+    this.net.sendData('HELLO',{name:myName});
+    if(this.net.role==='host'){
+      this.player1Name=myName;
+      document.getElementById('player1Pill').textContent='👑 '+myName+' (Host)';
+    }else{
+      this.player2Name=myName;
+      document.getElementById('player2Pill').textContent=myName+' (Guest)';
+    }
+    this._refreshLobbyUI();
+    this.showScreen('lobby');
+  }
+  
+  _refreshLobbyUI(){
+    document.getElementById('player1Pill').textContent='👑 '+this.player1Name+' (Host)';
+    document.getElementById('player2Pill').textContent=this.player2Name+' (Guest)';
+    if(this.net.role==='host'){
+      document.getElementById('lobbyHint').textContent='Выбери игру и нажми "Начать"';
+      document.querySelectorAll('.game-card').forEach(c=>c.classList.remove('locked'));
+      document.getElementById('startGameBtn').style.display='';
+    }else{
+      document.getElementById('lobbyHint').textContent='Ожидаем выбора хоста...';
+      document.querySelectorAll('.game-card').forEach(c=>c.classList.add('locked'));
+      document.getElementById('startGameBtn').style.display='none';
+    }
+  }
+  
+  _handleData(msg){
+    switch(msg.type){
+      case 'HELLO':
+        if(this.net.role==='host'){
+          this.player2Name=msg.payload.name;
+        }else{
+          this.player1Name=msg.payload.name;
+        }
+        this._refreshLobbyUI();
+        break;
+      case 'LOBBY_SELECT':
+        if(this.net.role==='guest'){
+          document.querySelectorAll('.game-card').forEach(c=>c.classList.remove('selected'));
+          const card=document.querySelector(`.game-card[data-game="${msg.payload.game}"]`);
+          if(card)card.classList.add('selected');
+          this.lobbySelectedGame=msg.payload.game;
+          document.getElementById('lobbyHint').textContent='Хост выбрал игру. Ожидаем старта...';
+        }
+        break;
+      case 'START_GAME':
+        this._startGame(msg.payload.game);
+        break;
+      case 'CHAT':
+        this._receiveChat(msg.payload.text);
+        break;
+      case 'REMATCH_REQUEST':
+        if(this.currentGame&&this.currentGame.over){
+          document.getElementById('rematchModal').classList.add('active');
+        }
+        break;
+      case 'REMATCH_ACCEPT':
+        this.showToast('✅ Соперник принял реванш');
+        this._doRematch();
+        break;
+      case 'REMATCH_DECLINE':
+        this.showToast('❌ Соперник отказал');
+        const r=document.getElementById('gameControls').querySelector('#rematchBtn');
+        if(r)r.disabled=false;
+        break;
+      case 'LEAVE_TO_LOBBY':
+        this._leaveToLobbyInternal();
+        this.showToast('Соперник вышел в лобби');
+        break;
+      default:
+        if(this.currentGame)this.currentGame.onData(msg);
+    }
+  }
+  
+  _startGame(gameKey){
+    this.currentGameKey=gameKey;
+    document.getElementById('gp1Name').textContent=this.player1Name;
+    document.getElementById('gp2Name').textContent=this.player2Name;
+    document.getElementById('gp1Score').textContent='0';
+    document.getElementById('gp2Score').textContent='0';
+    this.chatMessages=[];
+    this._renderChat();
+    
+    // Очистить контролы
+    const ctrl=document.getElementById('gameControls');
+    ctrl.innerHTML='<button class="btn ghost small" onclick="app.leaveToLobby()">← В лобби</button>';
+    
+    if(this.currentGame){this.currentGame.cleanup&&this.currentGame.cleanup()}
+    
+    const map={
+      tictactoe:TicTacToeGame,
+      connect4:Connect4Game,
+      pong:PongGame,
+      battleship:BattleshipGame,
+      rps:RPSGame
+    };
+    const Cls=map[gameKey];
+    this.currentGame=new Cls(this);
+    this.showScreen('game');
+    this.currentGame.start();
+  }
+  
+  _doRematch(){
+    if(!this.currentGame)return;
+    this.currentGame.reset(true);
+  }
+  
+  leaveToLobby(){
+    this.net.sendData('LEAVE_TO_LOBBY',{});
+    this._leaveToLobbyInternal();
+  }
+  _leaveToLobbyInternal(){
+    if(this.currentGame){this.currentGame.cleanup&&this.currentGame.cleanup();this.currentGame=null}
+    this.lobbySelectedGame=null;
+    document.querySelectorAll('.game-card').forEach(c=>c.classList.remove('selected'));
+    document.getElementById('startGameBtn').disabled=true;
+    this.showScreen('lobby');
+    this._refreshLobbyUI();
+  }
+  
+  _sendChat(text){
+    text=(text||'').trim();
+    if(!text)return;
+    document.getElementById('chatInput').value='';
+    const myName=(this.net.role==='host'?this.player1Name:this.player2Name);
+    this.chatMessages.push({author:myName,text,time:Date.now()});
+    if(this.chatMessages.length>20)this.chatMessages.shift();
+    this._renderChat();
+    this.net.sendData('CHAT',{text});
+  }
+  _receiveChat(text){
+    const oppName=(this.net.role==='host'?this.player2Name:this.player1Name);
+    this.chatMessages.push({author:oppName,text,time:Date.now()});
+    if(this.chatMessages.length>20)this.chatMessages.shift();
+    this._renderChat();
+    this.sound.playChat();
+  }
+  _renderChat(){
+    const box=document.getElementById('chatMessages');
+    const last=this.chatMessages.slice(-3);
+    box.innerHTML=last.map(m=>{
+      const t=new Date(m.time);
+      const time=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
+      return `<div class="chat-msg"><span class="author">${this._esc(m.author)}:</span> ${this._esc(m.text)}<span class="time">${time}</span></div>`;
+    }).join('');
+    box.scrollTop=box.scrollHeight;
+  }
+  _esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+  
+  _showDisconnected(){
+    this.showScreen('disconnected');
+    let attempts=0;
+    const status=document.getElementById('reconnectStatus');
+    const tryReconnect=()=>{
+      attempts++;
+      if(attempts>3){
+        status.textContent='Не удалось переподключиться. Вернись в меню.';
+        document.getElementById('reconnectSpinner').style.display='none';
+        return;
+      }
+      status.textContent=`Попытка ${attempts}/3...`;
+      // PeerJS не поддерживает простое переподключение, поэтому просто ждём
+      setTimeout(tryReconnect,3000);
+    };
+    tryReconnect();
+  }
+  
+  backToMenu(){
+    if(this.currentGame){this.currentGame.cleanup&&this.currentGame.cleanup();this.currentGame=null}
+    this.net.destroy();
+    this.net=new NetworkManager();
+    this._initNet();
+    history.replaceState(null,'',location.pathname);
+    this._renderStats();
+    this.showScreen('menu');
+  }
+  
+  leaveRoom(){this.backToMenu()}
+  
+  // === Статистика ===
+  _loadStats(){
+    try{this.stats=JSON.parse(localStorage.getItem('stats'))||{}}catch(e){this.stats={}}
+  }
+  _saveStats(){localStorage.setItem('stats',JSON.stringify(this.stats))}
+  recordResult(gameKey,result){
+    if(!this.stats[gameKey])this.stats[gameKey]={wins:0,losses:0,draws:0};
+    if(result==='win')this.stats[gameKey].wins++;
+    if(result==='loss')this.stats[gameKey].losses++;
+    if(result==='draw')this.stats[gameKey].draws++;
+    this._saveStats();
+  }
+  _renderStats(){
+    const grid=document.getElementById('statsGrid');
+    const games={tictactoe:'❌⭕ Крестики',connect4:'🟡 4 в ряд',pong:'🏓 Понг',battleship:'💣 Морской бой',rps:'✊ Камень'};
+    grid.innerHTML='';
+    Object.entries(games).forEach(([k,name])=>{
+      const s=this.stats[k]||{wins:0,losses:0,draws:0};
+      const div=document.createElement('div');div.className='stat-card';
+      div.innerHTML=`<div class="game-name">${name}</div><div class="nums"><span class="w">${s.wins}В</span><span class="l">${s.losses}П</span><span class="d">${s.draws}Н</span></div>`;
+      grid.appendChild(div);
+    });
+  }
+  
+  // === Toasts ===
+  showToast(text){
+    const t=document.createElement('div');t.className='toast';t.textContent=text;
+    document.body.appendChild(t);
+    setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity .3s';setTimeout(()=>t.remove(),300)},2200);
+  }
+  
+  // === Конфетти ===
+  fireConfetti(){
+    const canvas=document.getElementById('confetti');
+    canvas.classList.remove('hide');
+    canvas.width=innerWidth;canvas.height=innerHeight;
+    const ctx=canvas.getContext('2d');
+    const particles=[];
+    const colors=['#00f0ff','#ff00e5','#ffd400','#00ff88','#a200ff'];
+    for(let i=0;i<150;i++){
+      particles.push({
+        x:Math.random()*canvas.width,
+        y:-20,
+        vx:(Math.random()-.5)*6,
+        vy:Math.random()*3+2,
+        size:Math.random()*8+4,
+        color:colors[Math.floor(Math.random()*colors.length)],
+        rot:Math.random()*Math.PI*2,
+        vrot:(Math.random()-.5)*.3
+      });
+    }
+    let frames=0;
+    const animate=()=>{
+      frames++;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      particles.forEach(p=>{
+        p.x+=p.vx;p.y+=p.vy;p.vy+=.1;p.rot+=p.vrot;
+        ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot);
+        ctx.fillStyle=p.color;ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size);
+        ctx.restore();
+      });
+      if(frames<200)requestAnimationFrame(animate);
+      else canvas.classList.add('hide');
+    };
+    animate();
+  }
+}
+
+// === Запуск ===
+const app=new App();
+window.app=app;
+
+// Активация звука после первого клика
+document.addEventListener('click',()=>{app.sound._ensure()},{once:true});
+</script>
+</body>
+</html>
