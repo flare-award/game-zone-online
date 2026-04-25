@@ -511,6 +511,17 @@ class SoundManager{
 }
 
 // ============================================================
+// === НАСТРОЙКИ PEERJS СЕРВЕРА (Railway) ===
+// ============================================================
+const PEER_CONFIG = {
+  host: 'peerjs-server-production-a870.up.railway.app',
+  port: 443,
+  secure: true,
+  path: '/',
+  debug: 1
+};
+
+// ============================================================
 // === NETWORK MANAGER (PeerJS) ===
 // ============================================================
 class NetworkManager{
@@ -533,7 +544,10 @@ class NetworkManager{
       this.role='host';
       this.roomCode=this._genCode();
       const id=this._peerIdFromCode(this.roomCode);
-      this.peer=new Peer(id,{debug:1});
+      
+      // Подключение к нашему кастомному серверу Railway
+      this.peer=new Peer(id, PEER_CONFIG);
+      
       this.peer.on('open',()=>resolve(this.roomCode));
       this.peer.on('error',err=>{
         // Если ID занят — пробуем другой
@@ -555,7 +569,10 @@ class NetworkManager{
     return new Promise((resolve,reject)=>{
       this.role='guest';
       this.roomCode=code;
-      this.peer=new Peer({debug:1});
+      
+      // Подключение к нашему кастомному серверу Railway
+      this.peer=new Peer(PEER_CONFIG);
+      
       this.peer.on('open',()=>{
         const conn=this.peer.connect(this._peerIdFromCode(code),{reliable:true});
         this.connection=conn;
