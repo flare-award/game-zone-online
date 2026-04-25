@@ -322,6 +322,73 @@ input:focus{border-color:var(--neon);box-shadow:0 0 15px rgba(0,240,255,.4)}
 .modal.active{display:flex}
 .modal-content{background:linear-gradient(135deg,rgba(20,20,50,.95),rgba(40,15,70,.95));padding:2rem;border-radius:18px;border:1px solid var(--neon);max-width:400px;text-align:center}
 
+/* === Танки === */
+.tanks-canvas{background:#02020a;border:2px solid var(--neon2);border-radius:10px;
+  box-shadow:0 0 40px rgba(255,0,229,.4),inset 0 0 30px rgba(255,0,229,.05);max-width:100%;cursor:crosshair}
+.tanks-hud{display:flex;gap:1rem;margin-top:.5rem;font-family:'Orbitron',sans-serif;font-size:.85rem}
+.hp-bar{display:inline-block;width:120px;height:14px;background:rgba(255,48,96,.2);border:1px solid var(--red);border-radius:7px;overflow:hidden;vertical-align:middle;margin:0 .4rem}
+.hp-bar-fill{height:100%;background:linear-gradient(90deg,#00ff88,#ffd400,#ff3060);transition:width .2s}
+
+/* === Reaction Duel === */
+.react-arena{
+  width:100%;max-width:600px;min-height:300px;border-radius:20px;
+  display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;
+  font-size:1.5rem;text-align:center;cursor:pointer;user-select:none;
+  background:linear-gradient(135deg,#1a1a3a,#2a1a5a);
+  border:3px solid rgba(0,240,255,.3);transition:background .15s,border-color .15s;
+  padding:2rem;
+}
+.react-arena.wait{background:radial-gradient(circle,#3a1a1a,#1a0a0a);border-color:var(--red);color:var(--red)}
+.react-arena.go{background:radial-gradient(circle,#0a3a1a,#0a1a0a);border-color:var(--green);color:var(--green);font-size:3rem;animation:flashGo .3s}
+.react-arena.toosoon{background:radial-gradient(circle,#3a3a0a,#1a1a0a);border-color:var(--yellow);color:var(--yellow)}
+@keyframes flashGo{0%{transform:scale(.95)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+.react-stats{display:flex;gap:2rem;justify-content:center;margin-top:1rem;font-family:'Orbitron',sans-serif}
+.react-stats .ms{font-size:1.5rem;color:var(--neon)}
+
+/* === Виселица === */
+.hangman-wrap{display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%;max-width:600px}
+.hangman-svg{width:200px;height:220px}
+.hangman-svg line, .hangman-svg circle{stroke:var(--neon);stroke-width:3;fill:none;filter:drop-shadow(0 0 5px var(--neon))}
+.hangman-word{font-family:'Orbitron',sans-serif;font-size:2.5rem;letter-spacing:.5rem;color:var(--neon);text-shadow:0 0 20px var(--neon);min-height:3rem;text-align:center}
+.hangman-keyboard{display:grid;grid-template-columns:repeat(11,1fr);gap:.3rem;width:100%;max-width:550px}
+.hg-key{
+  padding:.6rem .2rem;background:rgba(0,0,30,.6);border:1px solid rgba(0,240,255,.3);
+  border-radius:6px;cursor:pointer;font-family:'Orbitron',sans-serif;font-weight:700;color:var(--text);
+  transition:all .15s;font-size:.9rem
+}
+.hg-key:hover:not(:disabled){background:rgba(0,240,255,.2);border-color:var(--neon);transform:translateY(-1px)}
+.hg-key.right{background:rgba(0,255,136,.3);border-color:var(--green);color:var(--green)}
+.hg-key.wrong{background:rgba(255,48,96,.3);border-color:var(--red);color:var(--red)}
+.hg-key:disabled{cursor:not-allowed;opacity:.7}
+.hangman-input-row{display:flex;gap:.5rem;align-items:center;width:100%;justify-content:center}
+.hangman-input-row input{font-size:1.2rem;text-align:center;letter-spacing:.2em;text-transform:lowercase;width:280px}
+.hangman-status{color:var(--muted);text-align:center;min-height:1.5rem}
+
+/* === Memory === */
+.mem-board{display:grid;gap:.5rem;perspective:1000px}
+.mem-card{
+  width:80px;height:80px;cursor:pointer;position:relative;transform-style:preserve-3d;
+  transition:transform .5s;border-radius:10px
+}
+.mem-card.flipped{transform:rotateY(180deg)}
+.mem-card.matched{transform:rotateY(180deg);animation:matched .6s}
+@keyframes matched{0%,100%{filter:brightness(1)}50%{filter:brightness(1.6) hue-rotate(60deg)}}
+.mem-face{
+  position:absolute;inset:0;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  backface-visibility:hidden;font-size:2.8rem;
+}
+.mem-front{
+  background:linear-gradient(135deg,var(--neon3),var(--neon2));
+  box-shadow:0 0 20px rgba(162,0,255,.5),inset 0 0 15px rgba(255,0,229,.3);
+  font-size:2rem;color:white
+}
+.mem-back{
+  background:linear-gradient(135deg,#0a1a3a,#1a0a3a);
+  border:2px solid var(--neon);transform:rotateY(180deg);
+  box-shadow:0 0 15px rgba(0,240,255,.4)
+}
+.mem-card.locked{cursor:not-allowed;opacity:.7}
+
 @media(max-width:600px){
   .ttt-board{grid-template-columns:repeat(3,80px);grid-template-rows:repeat(3,80px)}
   .ttt-cell{font-size:2.8rem}
@@ -330,6 +397,11 @@ input:focus{border-color:var(--neon);box-shadow:0 0 15px rgba(0,240,255,.4)}
   .bs-board{grid-template-columns:repeat(10,24px);grid-template-rows:repeat(10,24px)}
   .bs-cell{font-size:.7rem}
   .rps-display{width:120px;height:120px;font-size:5rem}
+  .hangman-keyboard{grid-template-columns:repeat(7,1fr)}
+  .hangman-word{font-size:1.8rem;letter-spacing:.3rem}
+  .mem-card{width:60px;height:60px}
+  .mem-front{font-size:1.5rem}
+  .mem-back{font-size:2rem}
 }
 </style>
 </head>
@@ -402,6 +474,10 @@ input:focus{border-color:var(--neon);box-shadow:0 0 15px rgba(0,240,255,.4)}
     <div class="game-card" data-game="pong"><div class="icon">🏓</div><div class="name">Пинг-понг</div></div>
     <div class="game-card" data-game="battleship"><div class="icon">💣</div><div class="name">Морской бой</div></div>
     <div class="game-card" data-game="rps"><div class="icon">✊✋✌️</div><div class="name">Камень-ножницы</div></div>
+    <div class="game-card" data-game="tanks"><div class="icon">🚀</div><div class="name">Танковый бой</div></div>
+    <div class="game-card" data-game="reaction"><div class="icon">⚡</div><div class="name">Дуэль реакций</div></div>
+    <div class="game-card" data-game="hangman"><div class="icon">🔤</div><div class="name">Виселица</div></div>
+    <div class="game-card" data-game="memory"><div class="icon">🧠</div><div class="name">Memory</div></div>
   </div>
 
   <div class="row">
@@ -1625,6 +1701,863 @@ class RPSGame extends BaseGame{
 }
 
 // ============================================================
+// === ТАНКОВЫЙ БОЙ ===
+// ============================================================
+class TanksGame extends BaseGame{
+  constructor(app){
+    super(app);this.gameKey='tanks';
+    this.W=720;this.H=480;
+    this.amHost=this.iAmP1();
+    this.maxHP=100;
+    this.scoreL=0;this.scoreR=0;
+    this.maxScore=3;
+    // Состояние танков: HOST = левый/синий, GUEST = правый/розовый
+    this.tanks={
+      host:{x:80,y:240,angle:0,hp:100,turret:0},
+      guest:{x:640,y:240,angle:Math.PI,hp:100,turret:Math.PI}
+    };
+    this.bullets=[]; // {x,y,vx,vy,owner,life}
+    this.walls=this._genWalls();
+    this.keys={};
+    this.mouse={x:0,y:0};
+    this.lastShot=0;
+    this.lastSync=0;
+    this.lastInputSend=0;
+    this.over=false;
+    this.respawnTimer=0;
+  }
+  _genWalls(){
+    // Симметричные препятствия
+    return [
+      {x:340,y:80,w:40,h:120},
+      {x:340,y:280,w:40,h:120},
+      {x:200,y:200,w:80,h:30},
+      {x:440,y:250,w:80,h:30},
+      {x:160,y:380,w:30,h:80},
+      {x:530,y:20,w:30,h:80},
+    ];
+  }
+  render(){
+    document.getElementById('turnIndicator').textContent='⚔️ В БОЮ';
+    document.getElementById('turnIndicator').className='turn-indicator my';
+    
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:.5rem';
+    
+    const canvas=document.createElement('canvas');
+    canvas.className='tanks-canvas';
+    canvas.width=this.W;canvas.height=this.H;
+    wrap.appendChild(canvas);
+    
+    const hud=document.createElement('div');hud.className='tanks-hud';
+    hud.innerHTML='WASD — движение • Мышь — прицел • Клик / Пробел — выстрел';
+    hud.style.color='var(--muted)';
+    wrap.appendChild(hud);
+    
+    this.area.appendChild(wrap);
+    this.canvas=canvas;this.ctx=canvas.getContext('2d');
+    
+    canvas.addEventListener('mousemove',e=>{
+      const r=canvas.getBoundingClientRect();
+      this.mouse.x=(e.clientX-r.left)*(this.W/r.width);
+      this.mouse.y=(e.clientY-r.top)*(this.H/r.height);
+    });
+    canvas.addEventListener('click',()=>this._tryShoot());
+    
+    this._kd=e=>{
+      this.keys[e.key.toLowerCase()]=true;
+      if(e.key===' '){e.preventDefault();this._tryShoot()}
+    };
+    this._ku=e=>{this.keys[e.key.toLowerCase()]=false};
+    window.addEventListener('keydown',this._kd);
+    window.addEventListener('keyup',this._ku);
+    
+    this.running=true;
+    this.loop();
+  }
+  _myKey(){return this.amHost?'host':'guest'}
+  _oppKey(){return this.amHost?'guest':'host'}
+  _tryShoot(){
+    if(this.over)return;
+    const now=Date.now();
+    if(now-this.lastShot<450)return;
+    this.lastShot=now;
+    const me=this.tanks[this._myKey()];
+    if(me.hp<=0)return;
+    const speed=8;
+    const bx=me.x+Math.cos(me.turret)*22;
+    const by=me.y+Math.sin(me.turret)*22;
+    const bullet={
+      x:bx,y:by,
+      vx:Math.cos(me.turret)*speed,
+      vy:Math.sin(me.turret)*speed,
+      owner:this._myKey(),life:90
+    };
+    this.bullets.push(bullet);
+    this.sound.playMove();
+    // Сообщить о выстреле (для гостя — host подтвердит, но для отзывчивости отправим всегда)
+    this.net.sendData('TANK_SHOOT',{x:bx,y:by,vx:bullet.vx,vy:bullet.vy,owner:bullet.owner});
+  }
+  _moveTank(t,dx,dy){
+    const sp=2.5;
+    const nx=t.x+dx*sp,ny=t.y+dy*sp;
+    // Угол поворота корпуса
+    if(dx||dy)t.angle=Math.atan2(dy,dx);
+    // Проверка границ
+    if(nx<22||nx>this.W-22)return;
+    if(ny<22||ny>this.H-22)return;
+    // Стены
+    for(const w of this.walls){
+      if(nx+18>w.x&&nx-18<w.x+w.w&&ny+18>w.y&&ny-18<w.y+w.h)return;
+    }
+    // Не наезжать на другого
+    const other=this.tanks[t===this.tanks.host?'guest':'host'];
+    const d2=(nx-other.x)**2+(ny-other.y)**2;
+    if(d2<40*40)return;
+    t.x=nx;t.y=ny;
+  }
+  loop(){
+    if(!this.running)return;
+    const me=this.tanks[this._myKey()];
+    if(me.hp>0&&!this.over){
+      let dx=0,dy=0;
+      if(this.keys['w'])dy-=1;
+      if(this.keys['s'])dy+=1;
+      if(this.keys['a'])dx-=1;
+      if(this.keys['d'])dx+=1;
+      if(this.keys['arrowup'])dy-=1;
+      if(this.keys['arrowdown'])dy+=1;
+      if(this.keys['arrowleft'])dx-=1;
+      if(this.keys['arrowright'])dx+=1;
+      if(dx||dy){
+        const len=Math.hypot(dx,dy);
+        this._moveTank(me,dx/len,dy/len);
+      }
+      me.turret=Math.atan2(this.mouse.y-me.y,this.mouse.x-me.x);
+    }
+    
+    // HOST = авторитет, считает физику пуль
+    if(this.amHost){
+      this._physics();
+      const now=Date.now();
+      if(now-this.lastSync>50){
+        this.lastSync=now;
+        this.net.sendData('TANK_SYNC',{
+          tanks:this.tanks,
+          bullets:this.bullets.map(b=>({x:b.x,y:b.y,vx:b.vx,vy:b.vy,owner:b.owner})),
+          scoreL:this.scoreL,scoreR:this.scoreR
+        });
+      }
+    }else{
+      // GUEST шлёт свои координаты/угол
+      const now=Date.now();
+      if(now-this.lastInputSend>40){
+        this.lastInputSend=now;
+        this.net.sendData('TANK_INPUT',{x:me.x,y:me.y,angle:me.angle,turret:me.turret,hp:me.hp});
+      }
+    }
+    
+    this._draw();
+    requestAnimationFrame(()=>this.loop());
+  }
+  _physics(){
+    // Двигаем пули
+    this.bullets.forEach(b=>{b.x+=b.vx;b.y+=b.vy;b.life--});
+    // Удаляем за границами
+    this.bullets=this.bullets.filter(b=>{
+      if(b.life<=0)return false;
+      if(b.x<0||b.x>this.W||b.y<0||b.y>this.H)return false;
+      // Стены
+      for(const w of this.walls){
+        if(b.x>w.x&&b.x<w.x+w.w&&b.y>w.y&&b.y<w.y+w.h)return false;
+      }
+      // Попадание во врага владельца
+      const targetKey=b.owner==='host'?'guest':'host';
+      const t=this.tanks[targetKey];
+      if(t.hp>0){
+        const d2=(b.x-t.x)**2+(b.y-t.y)**2;
+        if(d2<22*22){
+          t.hp-=20;
+          this.sound.playHit();
+          if(t.hp<=0){
+            t.hp=0;
+            // Очко владельцу пули
+            if(b.owner==='host')this.scoreL++;else this.scoreR++;
+            this.setScores(this.scoreL,this.scoreR);
+            // Проверка победы серии
+            if(this.scoreL>=this.maxScore||this.scoreR>=this.maxScore){
+              this.over=true;
+              const iWon=(this.scoreL>=this.maxScore)===this.amHost;
+              setTimeout(()=>this.endGame(iWon),500);
+            }else{
+              // Респавн через 2 сек
+              setTimeout(()=>{
+                if(targetKey==='host'){t.x=80;t.y=240;t.angle=0;t.turret=0}
+                else{t.x=640;t.y=240;t.angle=Math.PI;t.turret=Math.PI}
+                t.hp=this.maxHP;
+              },2000);
+            }
+          }
+          return false;
+        }
+      }
+      return true;
+    });
+  }
+  onData(msg){
+    if(msg.type==='TANK_SYNC'&&!this.amHost){
+      // Гостю синхрон от хоста (кроме его собственного танка — оставляем локальный)
+      const localMe=this.tanks.guest;
+      this.tanks.host=msg.payload.tanks.host;
+      // Берём HP из синка (авторитет), но позицию свою (lag-compensated)
+      this.tanks.guest.hp=msg.payload.tanks.guest.hp;
+      // Если умер и заресп (большой скачок) — синхронизируемся
+      const sg=msg.payload.tanks.guest;
+      if(Math.hypot(sg.x-localMe.x,sg.y-localMe.y)>80){
+        this.tanks.guest.x=sg.x;this.tanks.guest.y=sg.y;
+      }
+      this.bullets=msg.payload.bullets.map(b=>({...b,life:90}));
+      this.scoreL=msg.payload.scoreL;this.scoreR=msg.payload.scoreR;
+      this.setScores(this.scoreL,this.scoreR);
+      if((this.scoreL>=this.maxScore||this.scoreR>=this.maxScore)&&!this.over){
+        this.over=true;
+        const iWon=(this.scoreL>=this.maxScore)===this.amHost;
+        setTimeout(()=>this.endGame(iWon),500);
+      }
+    }else if(msg.type==='TANK_INPUT'&&this.amHost){
+      const g=this.tanks.guest;
+      g.x=msg.payload.x;g.y=msg.payload.y;
+      g.angle=msg.payload.angle;g.turret=msg.payload.turret;
+    }else if(msg.type==='TANK_SHOOT'){
+      // Если выстрел от соперника — добавим у себя для визуала (host — авторитет, всё равно засчитает)
+      if(msg.payload.owner!==this._myKey()){
+        this.bullets.push({...msg.payload,life:90});
+      }
+    }
+  }
+  _draw(){
+    const ctx=this.ctx;
+    // Фон
+    ctx.fillStyle='rgba(2,2,10,.4)';ctx.fillRect(0,0,this.W,this.H);
+    // Сетка
+    ctx.strokeStyle='rgba(255,0,229,.08)';ctx.lineWidth=1;
+    for(let x=0;x<this.W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,this.H);ctx.stroke()}
+    for(let y=0;y<this.H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(this.W,y);ctx.stroke()}
+    // Стены
+    this.walls.forEach(w=>{
+      ctx.fillStyle='rgba(80,80,140,.6)';
+      ctx.strokeStyle='var(--neon)';
+      ctx.shadowBlur=10;ctx.shadowColor='#00f0ff';
+      ctx.strokeStyle='#00f0ff';ctx.lineWidth=2;
+      ctx.fillRect(w.x,w.y,w.w,w.h);
+      ctx.strokeRect(w.x,w.y,w.w,w.h);
+      ctx.shadowBlur=0;
+    });
+    // Танки
+    this._drawTank(this.tanks.host,'#00f0ff','#0066cc');
+    this._drawTank(this.tanks.guest,'#ff00e5','#a200ff');
+    // Пули
+    this.bullets.forEach(b=>{
+      ctx.shadowBlur=15;
+      ctx.shadowColor=b.owner==='host'?'#00f0ff':'#ff00e5';
+      ctx.fillStyle='#fff';
+      ctx.beginPath();ctx.arc(b.x,b.y,4,0,Math.PI*2);ctx.fill();
+      ctx.shadowBlur=0;
+    });
+    // HP бары
+    this._drawHP(this.tanks.host,'#00f0ff');
+    this._drawHP(this.tanks.guest,'#ff00e5');
+    // Счёт
+    ctx.font='bold 36px Orbitron, sans-serif';
+    ctx.fillStyle='rgba(255,255,255,.15)';ctx.textAlign='center';
+    ctx.fillText(this.scoreL+' : '+this.scoreR,this.W/2,40);
+  }
+  _drawTank(t,c1,c2){
+    if(t.hp<=0)return;
+    const ctx=this.ctx;
+    ctx.save();
+    ctx.translate(t.x,t.y);
+    ctx.rotate(t.angle);
+    // Корпус
+    ctx.shadowBlur=15;ctx.shadowColor=c1;
+    ctx.fillStyle=c2;
+    ctx.fillRect(-18,-14,36,28);
+    ctx.strokeStyle=c1;ctx.lineWidth=2;
+    ctx.strokeRect(-18,-14,36,28);
+    // Гусеницы
+    ctx.fillStyle='#222';
+    ctx.fillRect(-20,-18,40,5);
+    ctx.fillRect(-20,13,40,5);
+    ctx.restore();
+    // Башня + ствол
+    ctx.save();
+    ctx.translate(t.x,t.y);
+    ctx.rotate(t.turret);
+    ctx.shadowBlur=15;ctx.shadowColor=c1;
+    ctx.fillStyle=c1;
+    ctx.beginPath();ctx.arc(0,0,10,0,Math.PI*2);ctx.fill();
+    ctx.fillRect(0,-3,22,6);
+    ctx.shadowBlur=0;
+    ctx.restore();
+  }
+  _drawHP(t,color){
+    if(t.hp<=0)return;
+    const ctx=this.ctx;
+    const w=40,h=5;
+    ctx.fillStyle='rgba(0,0,0,.6)';
+    ctx.fillRect(t.x-w/2,t.y-30,w,h);
+    ctx.fillStyle=color;
+    ctx.fillRect(t.x-w/2,t.y-30,w*(t.hp/this.maxHP),h);
+  }
+  reset(){
+    this.tanks={
+      host:{x:80,y:240,angle:0,hp:100,turret:0},
+      guest:{x:640,y:240,angle:Math.PI,hp:100,turret:Math.PI}
+    };
+    this.bullets=[];
+    this.scoreL=0;this.scoreR=0;
+    this.over=false;
+    this.setScores(0,0);
+    document.getElementById('turnIndicator').className='turn-indicator my';
+    document.getElementById('turnIndicator').textContent='⚔️ В БОЮ';
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+  }
+  cleanup(){
+    this.running=false;
+    window.removeEventListener('keydown',this._kd);
+    window.removeEventListener('keyup',this._ku);
+  }
+}
+
+// ============================================================
+// === ДУЭЛЬ РЕАКЦИЙ ===
+// ============================================================
+class ReactionGame extends BaseGame{
+  constructor(app){
+    super(app);this.gameKey='reaction';
+    this.maxRounds=5;
+    this.round=0;
+    this.state='idle'; // idle | wait | go | done
+    this.startTime=0;
+    this.myTime=null;this.oppTime=null;
+    this.amHost=this.iAmP1();
+    this.timeoutId=null;
+  }
+  render(){
+    document.getElementById('turnIndicator').textContent=`РАУНД ${this.round+1}/${this.maxRounds}`;
+    document.getElementById('turnIndicator').className='turn-indicator my';
+    
+    const wrap=document.createElement('div');
+    wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:1rem;width:100%';
+    
+    const arena=document.createElement('div');arena.className='react-arena';arena.id='reactArena';
+    arena.textContent=this.amHost?'Нажми чтобы начать раунд':'Ожидание хоста...';
+    arena.onclick=()=>this._click();
+    wrap.appendChild(arena);
+    
+    const stats=document.createElement('div');stats.className='react-stats';
+    stats.innerHTML=`<div>Ты: <span class="ms" id="reactMy">--</span></div><div>Соперник: <span class="ms" id="reactOpp">--</span></div>`;
+    wrap.appendChild(stats);
+    
+    this.area.appendChild(wrap);
+    this.arenaEl=arena;
+    
+    this._sp=e=>{if(e.code==='Space'){e.preventDefault();this._click()}};
+    window.addEventListener('keydown',this._sp);
+  }
+  _click(){
+    if(this.over)return;
+    if(this.state==='idle'&&this.amHost){
+      // Запускаем раунд — генерим задержку
+      this._startRound();
+    }else if(this.state==='wait'){
+      // Слишком рано
+      this.arenaEl.className='react-arena toosoon';
+      this.arenaEl.textContent='⚠️ Слишком рано! Штраф +500мс';
+      this.myTime=99999;
+      this.net.sendData('REACT_TIME',{time:99999,early:true});
+      this.state='done';
+      this._tryFinishRound();
+    }else if(this.state==='go'&&this.myTime===null){
+      const t=Date.now()-this.startTime;
+      this.myTime=t;
+      this.arenaEl.textContent=`⚡ ${t} мс`;
+      document.getElementById('reactMy').textContent=t+' мс';
+      this.net.sendData('REACT_TIME',{time:t,early:false});
+      this._tryFinishRound();
+    }
+  }
+  _startRound(){
+    this.myTime=null;this.oppTime=null;
+    document.getElementById('reactMy').textContent='--';
+    document.getElementById('reactOpp').textContent='--';
+    const delay=1500+Math.random()*3500;
+    this.state='wait';
+    this.arenaEl.className='react-arena wait';
+    this.arenaEl.textContent='Жди ЗЕЛЁНОГО сигнала...';
+    this.net.sendData('REACT_START',{delay});
+    this.timeoutId=setTimeout(()=>this._go(),delay);
+  }
+  _go(){
+    this.state='go';
+    this.startTime=Date.now();
+    this.arenaEl.className='react-arena go';
+    this.arenaEl.textContent='ЖМИ!';
+    this.sound.playMove();
+  }
+  onData(msg){
+    if(msg.type==='REACT_START'&&!this.amHost){
+      this.myTime=null;this.oppTime=null;
+      document.getElementById('reactMy').textContent='--';
+      document.getElementById('reactOpp').textContent='--';
+      this.state='wait';
+      this.arenaEl.className='react-arena wait';
+      this.arenaEl.textContent='Жди ЗЕЛЁНОГО сигнала...';
+      this.timeoutId=setTimeout(()=>this._go(),msg.payload.delay);
+    }else if(msg.type==='REACT_TIME'){
+      this.oppTime=msg.payload.time;
+      document.getElementById('reactOpp').textContent=msg.payload.early?'РАНО!':msg.payload.time+' мс';
+      this._tryFinishRound();
+    }
+  }
+  _tryFinishRound(){
+    if(this.myTime===null||this.oppTime===null)return;
+    this.state='done';
+    let myWin=this.myTime<this.oppTime;
+    let draw=this.myTime===this.oppTime;
+    if(!draw){
+      if(myWin){
+        this.setScores(this.scores.p1+(this.amHost?1:0),this.scores.p2+(this.amHost?0:1));
+      }else{
+        this.setScores(this.scores.p1+(this.amHost?0:1),this.scores.p2+(this.amHost?1:0));
+      }
+    }
+    this.round++;
+    if(this.round>=this.maxRounds||this.scores.p1>this.maxRounds/2||this.scores.p2>this.maxRounds/2){
+      const iWon=(this.amHost&&this.scores.p1>this.scores.p2)||(!this.amHost&&this.scores.p2>this.scores.p1);
+      const tied=this.scores.p1===this.scores.p2;
+      this.endGame(iWon,tied);
+      return;
+    }
+    document.getElementById('turnIndicator').textContent=`РАУНД ${this.round+1}/${this.maxRounds}`;
+    setTimeout(()=>{
+      this.state='idle';
+      this.arenaEl.className='react-arena';
+      this.arenaEl.textContent=this.amHost?'Нажми чтобы начать следующий раунд':'Ожидание хоста...';
+    },1800);
+  }
+  reset(){
+    this.round=0;this.state='idle';this.myTime=null;this.oppTime=null;
+    this.over=false;
+    this.setScores(0,0);
+    if(this.timeoutId)clearTimeout(this.timeoutId);
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+    this.area.innerHTML='';this.render();
+  }
+  cleanup(){
+    if(this.timeoutId)clearTimeout(this.timeoutId);
+    if(this._sp)window.removeEventListener('keydown',this._sp);
+  }
+}
+
+// ============================================================
+// === ВИСЕЛИЦА ===
+// ============================================================
+class HangmanGame extends BaseGame{
+  constructor(app){
+    super(app);this.gameKey='hangman';
+    this.maxWrong=6;
+    // Кто загадывает: чередуется. Первый — host
+    this.guesserIsHost=false; // host загадывает первым → угадывает гость
+    this.phase='setword'; // setword | guess
+    this.word='';
+    this.guessed=new Set();
+    this.wrong=0;
+  }
+  _amGuesser(){return this.guesserIsHost?this.iAmP1():!this.iAmP1()}
+  _amSetter(){return !this._amGuesser()}
+  
+  render(){
+    this.area.innerHTML='';
+    const wrap=document.createElement('div');wrap.className='hangman-wrap';
+    
+    if(this.phase==='setword'){
+      if(this._amSetter()){
+        document.getElementById('turnIndicator').textContent='🔤 ЗАГАДАЙТЕ СЛОВО';
+        document.getElementById('turnIndicator').className='turn-indicator my';
+        const h=document.createElement('h3');h.textContent='Загадайте слово (3-15 букв)';
+        h.style.fontFamily='Orbitron';
+        wrap.appendChild(h);
+        const inp=document.createElement('input');inp.placeholder='загадайте слово...';
+        inp.maxLength=15;inp.style.fontSize='1.2rem';inp.style.textAlign='center';
+        inp.style.width='280px';inp.style.letterSpacing='.2em';
+        wrap.appendChild(inp);
+        const btn=document.createElement('button');btn.className='btn green';btn.textContent='✓ Загадать';
+        btn.onclick=()=>{
+          const w=inp.value.toLowerCase().trim().replace(/[^a-zа-яё]/gi,'');
+          if(w.length<3||w.length>15){this.app.showToast('От 3 до 15 букв');return}
+          this.word=w;this.guessed=new Set();this.wrong=0;
+          this.phase='guess';
+          this.net.sendData('HG_WORD',{length:w.length});
+          this.render();
+        };
+        wrap.appendChild(btn);
+        setTimeout(()=>inp.focus(),100);
+      }else{
+        document.getElementById('turnIndicator').textContent='⏳ ОЖИДАНИЕ';
+        document.getElementById('turnIndicator').className='turn-indicator opp';
+        const h=document.createElement('h3');h.textContent='Соперник загадывает слово...';
+        h.style.fontFamily='Orbitron';
+        wrap.appendChild(h);
+        const sp=document.createElement('div');sp.className='spinner';
+        wrap.appendChild(sp);
+      }
+    }else{
+      // Фаза угадывания
+      if(this._amGuesser()){
+        document.getElementById('turnIndicator').textContent='🎯 УГАДЫВАЙ';
+        document.getElementById('turnIndicator').className='turn-indicator my';
+      }else{
+        document.getElementById('turnIndicator').textContent='👀 СОПЕРНИК УГАДЫВАЕТ';
+        document.getElementById('turnIndicator').className='turn-indicator opp';
+      }
+      
+      // SVG виселицы
+      const svg=this._buildHangmanSVG();
+      wrap.appendChild(svg);
+      
+      // Слово (с пропусками)
+      const wordDiv=document.createElement('div');wordDiv.className='hangman-word';
+      const display=this._amSetter()?this.word:this._maskedWord();
+      wordDiv.textContent=display.split('').join(' ').toUpperCase();
+      wrap.appendChild(wordDiv);
+      
+      const status=document.createElement('div');status.className='hangman-status';
+      status.textContent=`Ошибок: ${this.wrong}/${this.maxWrong}`;
+      wrap.appendChild(status);
+      
+      // Клавиатура (только для угадывающего)
+      if(this._amGuesser()){
+        const kb=document.createElement('div');kb.className='hangman-keyboard';
+        // Латиница + кириллица — определим алфавит по слову
+        const isCyr=/[а-яё]/i.test(this.word||'_');
+        // У гостя нет слова — определим по локальному состоянию: запросим алфавит у setter
+        // Используем оба алфавита всегда:
+        const alpha=this._guessAlphabet();
+        alpha.split('').forEach(ch=>{
+          const k=document.createElement('button');k.className='hg-key';k.textContent=ch.toUpperCase();
+          if(this.guessed.has(ch)){
+            k.disabled=true;
+            // Проверка попал/нет — но угадывающий не знает слова
+            // Используем wordMask который setter присылает
+            if(this.wordMask&&this.wordMask.includes(ch))k.classList.add('right');
+            else k.classList.add('wrong');
+          }
+          k.onclick=()=>this._guess(ch);
+          kb.appendChild(k);
+        });
+        wrap.appendChild(kb);
+      }else{
+        // Setter видит выбранные буквы
+        const kb=document.createElement('div');kb.className='hangman-keyboard';
+        const alpha=/[а-яё]/i.test(this.word)?'абвгдеёжзийклмнопрстуфхцчшщъыьэюя':'abcdefghijklmnopqrstuvwxyz';
+        alpha.split('').forEach(ch=>{
+          const k=document.createElement('button');k.className='hg-key';k.textContent=ch.toUpperCase();
+          k.disabled=true;
+          if(this.guessed.has(ch)){
+            if(this.word.includes(ch))k.classList.add('right');
+            else k.classList.add('wrong');
+          }
+          kb.appendChild(k);
+        });
+        wrap.appendChild(kb);
+      }
+    }
+    
+    this.area.appendChild(wrap);
+  }
+  _guessAlphabet(){
+    // Если у нас есть подсказка алфавита (от setter)
+    if(this._alphabetHint==='cyr')return 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+    if(this._alphabetHint==='lat')return 'abcdefghijklmnopqrstuvwxyz';
+    // По умолчанию — обе (но это много)
+    return 'abcdefghijklmnopqrstuvwxyzабвгдеёжзийклмнопрстуфхцчшщъыьэюя';
+  }
+  _maskedWord(){
+    if(!this._wordLength)return '_';
+    let s='';
+    for(let i=0;i<this._wordLength;i++){
+      const ch=this.wordMask?this.wordMask[i]:'_';
+      s+=ch||'_';
+    }
+    return s;
+  }
+  _guess(ch){
+    if(this.guessed.has(ch)||!this._amGuesser()||this.over)return;
+    this.guessed.add(ch);
+    this.net.sendData('HG_GUESS',{letter:ch});
+  }
+  _buildHangmanSVG(){
+    const ns='http://www.w3.org/2000/svg';
+    const svg=document.createElementNS(ns,'svg');
+    svg.setAttribute('class','hangman-svg');
+    svg.setAttribute('viewBox','0 0 200 220');
+    const add=(tag,attrs)=>{const el=document.createElementNS(ns,tag);for(const k in attrs)el.setAttribute(k,attrs[k]);svg.appendChild(el)};
+    // База
+    add('line',{x1:10,y1:210,x2:190,y2:210});
+    add('line',{x1:50,y1:210,x2:50,y2:10});
+    add('line',{x1:50,y1:10,x2:140,y2:10});
+    add('line',{x1:140,y1:10,x2:140,y2:30});
+    if(this.wrong>=1)add('circle',{cx:140,cy:50,r:20});
+    if(this.wrong>=2)add('line',{x1:140,y1:70,x2:140,y2:140});
+    if(this.wrong>=3)add('line',{x1:140,y1:90,x2:110,y2:120});
+    if(this.wrong>=4)add('line',{x1:140,y1:90,x2:170,y2:120});
+    if(this.wrong>=5)add('line',{x1:140,y1:140,x2:115,y2:180});
+    if(this.wrong>=6)add('line',{x1:140,y1:140,x2:165,y2:180});
+    return svg;
+  }
+  onData(msg){
+    if(msg.type==='HG_WORD'){
+      // Setter сообщает длину (само слово хранится только у setter)
+      this._wordLength=msg.payload.length;
+      this.wordMask=Array(this._wordLength).fill('_');
+      this.guessed=new Set();
+      this.wrong=0;
+      this.phase='guess';
+      this.render();
+    }else if(msg.type==='HG_GUESS'){
+      // Setter получает букву → проверяет → отвечает HG_RESULT
+      if(this._amSetter()){
+        const ch=msg.payload.letter;
+        this.guessed.add(ch);
+        const positions=[];
+        let updatedMask=this._wordLength?[...this.wordMask]:this.word.split('').map(c=>'_');
+        if(!this.wordMask){this.wordMask=this.word.split('').map(()=>'_')}
+        for(let i=0;i<this.word.length;i++){
+          if(this.word[i]===ch){positions.push(i);this.wordMask[i]=ch}
+        }
+        const hit=positions.length>0;
+        if(!hit)this.wrong++;
+        const won=!this.wordMask.includes('_');
+        const lost=this.wrong>=this.maxWrong;
+        this.net.sendData('HG_RESULT',{
+          letter:ch,positions,wrong:this.wrong,
+          mask:this.wordMask,won,lost,
+          word:(won||lost)?this.word:null,
+          alphabet:/[а-яё]/i.test(this.word)?'cyr':'lat'
+        });
+        this.render();
+        if(won||lost){
+          // Setter "проиграл" если угадавший угадал
+          const setterWins=lost; // setter побеждает если у него закончились попытки
+          if(setterWins){
+            this.setScores(this.scores.p1+(this.iAmP1()?1:0),this.scores.p2+(this.iAmP1()?0:1));
+          }else{
+            this.setScores(this.scores.p1+(this.iAmP1()?0:1),this.scores.p2+(this.iAmP1()?1:0));
+          }
+          this._endRound(setterWins);
+        }
+      }
+    }else if(msg.type==='HG_RESULT'){
+      // Угадывающий получает результат
+      if(this._amGuesser()){
+        this.guessed.add(msg.payload.letter);
+        this.wordMask=msg.payload.mask;
+        this.wrong=msg.payload.wrong;
+        this._alphabetHint=msg.payload.alphabet;
+        if(msg.payload.won||msg.payload.lost){
+          // Узнаём слово
+          this.word=msg.payload.word;
+          this._wordLength=this.word.length;
+        }
+        this.render();
+        if(msg.payload.won||msg.payload.lost){
+          // Угадывающий выиграл если won
+          const guesserWins=msg.payload.won;
+          if(guesserWins){
+            this.setScores(this.scores.p1+(this.iAmP1()?1:0),this.scores.p2+(this.iAmP1()?0:1));
+          }else{
+            this.setScores(this.scores.p1+(this.iAmP1()?0:1),this.scores.p2+(this.iAmP1()?1:0));
+          }
+          this._endRound(!guesserWins);
+        }
+      }
+    }
+  }
+  _endRound(setterWon){
+    setTimeout(()=>{
+      this.app.showToast(setterWon?'🎭 Слово не угадано! Победил загадавший':'🎯 Слово угадано!');
+      // До 3 побед — серия
+      if(this.scores.p1>=3||this.scores.p2>=3){
+        const iWon=(this.iAmP1()&&this.scores.p1>this.scores.p2)||(!this.iAmP1()&&this.scores.p2>this.scores.p1);
+        this.endGame(iWon);
+      }else{
+        // Меняем роли
+        this.guesserIsHost=!this.guesserIsHost;
+        this.phase='setword';
+        this.word='';this.wordMask=null;this._wordLength=null;
+        this.guessed=new Set();this.wrong=0;this._alphabetHint=null;
+        this.render();
+      }
+    },1500);
+  }
+  reset(){
+    this.guesserIsHost=false;
+    this.phase='setword';
+    this.word='';this.wordMask=null;this._wordLength=null;
+    this.guessed=new Set();this.wrong=0;this._alphabetHint=null;
+    this.over=false;
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+    this.render();
+  }
+}
+
+// ============================================================
+// === MEMORY (НАЙДИ ПАРЫ) ===
+// ============================================================
+class MemoryGame extends BaseGame{
+  constructor(app){
+    super(app);this.gameKey='memory';
+    this.cols=6;this.rows=4; // 24 карты = 12 пар
+    this.emojis=['🚀','🎮','🎯','🔥','⚡','🎨','🎵','🌟','💎','🎭','🏆','🦄'];
+    this.cards=[];
+    this.flipped=[]; // индексы открытых сейчас
+    this.matched=new Set();
+    this.scores.p1=0;this.scores.p2=0;
+    // host генерит расклад и шлёт guest-у
+    this.locked=false;
+  }
+  _genDeck(){
+    const pairs=this.emojis.slice(0,12);
+    const deck=[...pairs,...pairs];
+    // Перемешать
+    for(let i=deck.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [deck[i],deck[j]]=[deck[j],deck[i]];
+    }
+    return deck;
+  }
+  start(){
+    this.area.innerHTML='';
+    if(this.iAmP1()){
+      // Host генерит и шлёт
+      this.cards=this._genDeck();
+      this.net.sendData('MEM_DECK',{cards:this.cards});
+      this.render();
+    }else{
+      // Ждём deck
+      const wait=document.createElement('div');wait.className='spinner';
+      this.area.appendChild(wait);
+    }
+    this.updateTurnUI();
+  }
+  render(){
+    this.area.innerHTML='';
+    const board=document.createElement('div');board.className='mem-board';
+    board.style.gridTemplateColumns=`repeat(${this.cols},1fr)`;
+    this.cardEls=[];
+    this.cards.forEach((emo,i)=>{
+      const card=document.createElement('div');card.className='mem-card';
+      const back=document.createElement('div');back.className='mem-face mem-back';back.textContent=emo;
+      const front=document.createElement('div');front.className='mem-face mem-front';front.textContent='?';
+      card.appendChild(front);card.appendChild(back);
+      card.onclick=()=>this._flip(i);
+      board.appendChild(card);
+      this.cardEls.push(card);
+      if(this.matched.has(i)){card.classList.add('flipped','matched')}
+    });
+    this.area.appendChild(board);
+  }
+  _flip(i){
+    if(this.over||this.locked||!this.myTurn)return;
+    if(this.matched.has(i))return;
+    if(this.flipped.includes(i))return;
+    this._doFlip(i,true);
+    this.net.sendData('MEM_FLIP',{index:i});
+  }
+  _doFlip(i,fromMe){
+    this.flipped.push(i);
+    this.cardEls[i].classList.add('flipped');
+    this.sound.playMove();
+    if(this.flipped.length===2){
+      this.locked=true;
+      const [a,b]=this.flipped;
+      const isMatch=this.cards[a]===this.cards[b];
+      setTimeout(()=>{
+        if(isMatch){
+          this.matched.add(a);this.matched.add(b);
+          this.cardEls[a].classList.add('matched');
+          this.cardEls[b].classList.add('matched');
+          this.sound.playWin();
+          // Очко тому, чей сейчас ход
+          if(this.myTurn){
+            // Это я нашёл пару
+            this.setScores(
+              this.scores.p1+(this.iAmP1()?1:0),
+              this.scores.p2+(this.iAmP1()?0:1)
+            );
+          }else{
+            this.setScores(
+              this.scores.p1+(this.iAmP1()?0:1),
+              this.scores.p2+(this.iAmP1()?1:0)
+            );
+          }
+          // Не меняем ход — пара! Можно ещё
+          this.flipped=[];
+          this.locked=false;
+          // Проверка конца
+          if(this.matched.size>=this.cards.length){
+            const iWon=this.iAmP1()?this.scores.p1>this.scores.p2:this.scores.p2>this.scores.p1;
+            const tied=this.scores.p1===this.scores.p2;
+            this.endGame(iWon,tied);
+          }
+          this.updateTurnUI();
+        }else{
+          this.cardEls[a].classList.remove('flipped');
+          this.cardEls[b].classList.remove('flipped');
+          this.flipped=[];
+          this.locked=false;
+          // Меняем ход
+          this.myTurn=!this.myTurn;
+          this.updateTurnUI();
+        }
+      },1100);
+    }
+  }
+  onData(msg){
+    if(msg.type==='MEM_DECK'&&!this.iAmP1()){
+      this.cards=msg.payload.cards;
+      this.render();
+    }else if(msg.type==='MEM_FLIP'){
+      // Соперник перевернул карту
+      if(!this.myTurn||this.locked){
+        this._doFlip(msg.payload.index,false);
+      }else{
+        // Если по какой-то причине нам казалось, что наш ход — обновим
+        this.myTurn=false;this.updateTurnUI();
+        this._doFlip(msg.payload.index,false);
+      }
+    }
+  }
+  reset(){
+    this.over=false;
+    this.flipped=[];
+    this.matched=new Set();
+    this.scores.p1=0;this.scores.p2=0;
+    this.setScores(0,0);
+    this.myTurn=this.iAmP1();
+    this.locked=false;
+    const r=this.controls.querySelector('#rematchBtn');if(r)r.remove();
+    if(this.iAmP1()){
+      this.cards=this._genDeck();
+      this.net.sendData('MEM_DECK',{cards:this.cards});
+    }
+    this.render();
+    this.updateTurnUI();
+  }
+}
+
+// ============================================================
 // === ГЛАВНОЕ ПРИЛОЖЕНИЕ ===
 // ============================================================
 class App{
@@ -1895,7 +2828,11 @@ class App{
       connect4:Connect4Game,
       pong:PongGame,
       battleship:BattleshipGame,
-      rps:RPSGame
+      rps:RPSGame,
+      tanks:TanksGame,
+      reaction:ReactionGame,
+      hangman:HangmanGame,
+      memory:MemoryGame
     };
     const Cls=map[gameKey];
     this.currentGame=new Cls(this);
@@ -1994,7 +2931,7 @@ class App{
   }
   _renderStats(){
     const grid=document.getElementById('statsGrid');
-    const games={tictactoe:'❌⭕ Крестики',connect4:'🟡 4 в ряд',pong:'🏓 Понг',battleship:'💣 Морской бой',rps:'✊ Камень'};
+    const games={tictactoe:'❌⭕ Крестики',connect4:'🟡 4 в ряд',pong:'🏓 Понг',battleship:'💣 Морской бой',rps:'✊ Камень',tanks:'🚀 Танки',reaction:'⚡ Реакция',hangman:'🔤 Виселица',memory:'🧠 Memory'};
     grid.innerHTML='';
     Object.entries(games).forEach(([k,name])=>{
       const s=this.stats[k]||{wins:0,losses:0,draws:0};
